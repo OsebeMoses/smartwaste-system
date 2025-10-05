@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWaste - Collector Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --light-green: #e8f5e9;
+            --medium-green: #4caf50;
+            --dark-green: #2e7d32;
+            --accent-green: #81c784;
+            --warning-orange: #ff9800;
+            --info-blue: #2196f3;
+            --reward-gold: #ffd700;
+            --reward-silver: #c0c0c0;
+            --reward-bronze: #cd7f32;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --text-dark: #333333;
+            --border-light: #e0e0e0;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--light-green);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-green) 0%, var(--medium-green) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .menu-item i {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        .menu-item.active i {
+            color: var(--accent-green);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--medium-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-left: 4px solid;
+        }
+        
+        .stat-card.pending {
+            border-left-color: var(--warning-orange);
+            background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
+        }
+        
+        .stat-card.accepted {
+            border-left-color: var(--info-blue);
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+        
+        .stat-card.completed {
+            border-left-color: var(--medium-green);
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+        
+        .stat-card.rating {
+            border-left-color: #9c27b0;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+        
+        .stat-card.rewards {
+            border-left-color: var(--reward-gold);
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+        }
+        
+        .stat-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-card h5 {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--medium-green);
+            color: var(--medium-green);
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--medium-green);
+            border-color: var(--medium-green);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .btn-reward {
+            background: linear-gradient(135deg, var(--reward-gold) 0%, #ffc107 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Pickup Cards */
+        .pickup-card {
+            border-left: 4px solid var(--warning-orange);
+            transition: all 0.3s ease;
+        }
+        
+        .pickup-card:hover {
+            border-left-color: var(--medium-green);
+            background-color: var(--light-green);
+        }
+        
+        .pickup-card.accepted {
+            border-left-color: var(--info-blue);
+        }
+        
+        .pickup-card.completed {
+            border-left-color: var(--medium-green);
+        }
+        
+        .badge-pending {
+            background-color: var(--warning-orange);
+        }
+        
+        .badge-accepted {
+            background-color: var(--info-blue);
+        }
+        
+        .badge-completed {
+            background-color: var(--medium-green);
+        }
+        
+        /* Header Cards */
+        .card-header {
+            background: linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin: 0;
+        }
+        
+        /* Progress Bars */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e0e0e0;
+        }
+        
+        .progress-bar {
+            border-radius: 4px;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .sidebar-header h3 span, .menu-item span {
+                display: none;
+            }
+            
+            .sidebar-header h3 {
+                justify-content: center;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 0.8rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.4rem;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .stat-card h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .btn-group .btn {
+                width: auto;
+            }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #757575;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #bdbdbd;
+        }
+        
+        /* Toggle Button for Mobile */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-green);
+            margin-right: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        /* Dashboard Sections */
+        .dashboard-section {
+            display: none;
+        }
+        
+        .dashboard-section.active {
+            display: block;
+        }
+        
+        /* Map Container */
+        #mapContainer {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Earnings Chart */
+        .earnings-chart {
+            height: 250px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        /* Performance Metrics */
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        /* Reward Cards */
+        .reward-card {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .reward-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--reward-gold);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .reward-tier-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .tier-gold {
+            background: linear-gradient(135deg, var(--reward-gold), #ffc107);
+            color: #333;
+        }
+        
+        .tier-silver {
+            background: linear-gradient(135deg, var(--reward-silver), #b0b0b0);
+            color: #333;
+        }
+        
+        .tier-bronze {
+            background: linear-gradient(135deg, var(--reward-bronze), #8c5a2b);
+            color: white;
+        }
+        
+        .reward-image-container {
+            height: 120px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .reward-image {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+        
+        .toast {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Reward Progress */
+        .reward-progress {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tier-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            position: relative;
+        }
+        
+        .tier-indicator {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .tier-indicator:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .tier-indicator.active::after {
+            background: var(--medium-green);
+        }
+        
+        .tier-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin: 0 auto 0.5rem;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tier-indicator.active .tier-dot {
+            background: var(--medium-green);
+        }
+        
+        .tier-indicator.completed .tier-dot {
+            background: var(--medium-green);
+        }
+        
+        .tier-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .tier-points {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-recycle me-2"></i><span>SmartWaste</span></h3>
+        </div>
+        <div class="sidebar-menu">
+            <a href="#" class="menu-item active" data-section="dashboard">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="menu-item" data-section="pickups">
+                <i class="bi bi-truck"></i>
+                <span>Pickup Requests</span>
+                <span class="notification-badge" id="pickupNotification">12</span>
+            </a>
+            <a href="#" class="menu-item" data-section="schedule">
+                <i class="bi bi-calendar-check"></i>
+                <span>My Schedule</span>
+            </a>
+            <a href="#" class="menu-item" data-section="performance">
+                <i class="bi bi-graph-up"></i>
+                <span>Performance</span>
+            </a>
+            <a href="#" class="menu-item" data-section="earnings">
+                <i class="bi bi-cash-coin"></i>
+                <span>Earnings</span>
+            </a>
+            <a href="#" class="menu-item" data-section="rewards">
+                <i class="bi bi-award"></i>
+                <span>Rewards</span>
+                <span class="notification-badge" id="rewardNotification" style="display: none;">3</span>
+            </a>
+            <a href="#" class="menu-item" data-section="map">
+                <i class="bi bi-map"></i>
+                <span>Service Area</span>
+            </a>
+            <a href="#" class="menu-item" data-section="profile">
+                <i class="bi bi-person"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="#" class="menu-item" data-section="settings">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="d-flex align-items-center">
+                <button class="menu-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0">Collector Dashboard</h4>
+            </div>
+            <div class="user-info">
+                <div class="me-3 text-end d-none d-md-block">
+                    <div id="collectorName" class="fw-bold">Michael Johnson</div>
+                    <small class="opacity-75">Waste Collector</small>
+                </div>
+                <div class="dropdown">
+                    <a class="dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-section="profile"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                        <li><a class="dropdown-item" href="#" data-section="rewards"><i class="bi bi-award me-2"></i>My Rewards</a></li>
+                        <li><a class="dropdown-item" href="#" data-section="settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="dashboard-section active">
+            <!-- Stats Overview -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card stat-card pending">
+                        <div class="card-body">
+                            <h5><i class="bi bi-clock-history me-2"></i>Pending</h5>
+                            <h2 id="pendingCount">12</h2>
+                            <p class="text-muted mb-0">Pickups waiting</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card stat-card accepted">
+                        <div class="card-body">
+                            <h5><i class="bi bi-check-circle me-2"></i>Accepted</h5>
+                            <h2 id="acceptedCount">8</h2>
+                            <p class="text-muted mb-0">In progress</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card stat-card completed">
+                        <div class="card-body">
+                            <h5><i class="bi bi-trophy me-2"></i>Completed</h5>
+                            <h2 id="completedCount">24</h2>
+                            <p class="text-muted mb-0">This week</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card stat-card rewards">
+                        <div class="card-body">
+                            <h5><i class="bi bi-award me-2"></i>Reward Points</h5>
+                            <h2 id="rewardPoints">850</h2>
+                            <p class="text-muted mb-0">Available points</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3 col-sm-6">
+                            <button class="btn btn-outline-primary w-100 h-100 py-3" data-section="pickups">
+                                <i class="bi bi-list-ul fs-2 d-block mb-2"></i>
+                                View All Requests
+                            </button>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <button class="btn btn-outline-primary w-100 h-100 py-3" data-section="schedule">
+                                <i class="bi bi-calendar-check fs-2 d-block mb-2"></i>
+                                Today's Schedule
+                            </button>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <button class="btn btn-outline-primary w-100 h-100 py-3" data-section="performance">
+                                <i class="bi bi-graph-up fs-2 d-block mb-2"></i>
+                                My Performance
+                            </button>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <button class="btn btn-outline-primary w-100 h-100 py-3" data-section="rewards">
+                                <i class="bi bi-award fs-2 d-block mb-2"></i>
+                                My Rewards
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Pickups Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="bi bi-exclamation-triangle me-2"></i>Pending Pickup Requests</h2>
+                        <span class="badge bg-warning fs-6">12 requests</span>
+                    </div>
+                    
+                    <div id="pendingPickupsList">
+                        <!-- Pickup requests will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Today's Schedule</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="todayScheduleList" class="list-group list-group-flush">
+                                <!-- Schedule items will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Weekly Performance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Completion Rate</span>
+                                    <span>92%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>On-time Performance</span>
+                                    <span>88%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Customer Satisfaction</span>
+                                    <span>95%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" style="width: 95%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pickups Section -->
+        <div id="pickups-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-truck me-2"></i>All Pickup Requests</h2>
+                <button class="btn btn-primary" onclick="loadPendingPickups()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Location</th>
+                                    <th>Waste Type</th>
+                                    <th>Status</th>
+                                    <th>Requested</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allPickupsTable">
+                                <!-- Pickup requests will be dynamically loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div id="schedule-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-calendar-check me-2"></i>My Schedule</h2>
+                <button class="btn btn-primary" onclick="showTodaySchedule()">
+                    <i class="bi bi-calendar-day me-1"></i>Today's Schedule
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-schedule="today">Today</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-schedule="week">This Week</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-schedule="month">This Month</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div id="today-schedule">
+                        <div class="list-group list-group-flush" id="scheduleList">
+                            <!-- Schedule items will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Section -->
+        <div id="performance-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-graph-up me-2"></i>My Performance</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary active" data-period="week">This Week</button>
+                    <button class="btn btn-outline-primary" data-period="month">This Month</button>
+                    <button class="btn btn-outline-primary" data-period="year">This Year</button>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Completion Rate</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <div class="metric-value">88%</div>
+                        <div class="metric-label">On-time Performance</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <div class="metric-value">4.8/5</div>
+                        <div class="metric-label">Customer Rating</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <div class="metric-value">24</div>
+                        <div class="metric-label">Completed This Week</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Trends</h5>
+                    <div class="earnings-chart">
+                        <p class="text-muted">Performance chart would be displayed here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings Section -->
+        <div id="earnings-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-cash-coin me-2"></i>My Earnings</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary active" data-earnings-period="week">This Week</button>
+                    <button class="btn btn-outline-primary" data-earnings-period="month">This Month</button>
+                    <button class="btn btn-outline-primary" data-earnings-period="year">This Year</button>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Total Earnings</h5>
+                            <h2 class="text-success">$1,240</h2>
+                            <p class="text-muted mb-0">This month</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Completed Jobs</h5>
+                            <h2 class="text-primary">24</h2>
+                            <p class="text-muted mb-0">This week</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Avg. per Job</h5>
+                            <h2 class="text-info">$51.67</h2>
+                            <p class="text-muted mb-0">This month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Earnings Overview</h5>
+                    <div class="earnings-chart">
+                        <p class="text-muted">Earnings chart would be displayed here</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Job ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="earningsTable">
+                                <!-- Earnings data will be dynamically loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rewards Section -->
+        <div id="rewards-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-award me-2"></i>My Rewards</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary active" data-rewards-filter="all">All Rewards</button>
+                    <button class="btn btn-outline-primary" data-rewards-filter="available">Available</button>
+                    <button class="btn btn-outline-primary" data-rewards-filter="redeemed">Redeemed</button>
+                </div>
+            </div>
+            
+            <!-- Reward Progress -->
+            <div class="reward-progress">
+                <h5 class="mb-3">Your Reward Progress</h5>
+                <div class="progress mb-2" style="height: 15px;">
+                    <div class="progress-bar bg-warning" id="tierProgressBar" style="width: 85%"></div>
+                </div>
+                <div class="tier-indicators">
+                    <div class="tier-indicator completed">
+                        <div class="tier-dot"><i class="bi bi-check-lg"></i></div>
+                        <div class="tier-name">Bronze</div>
+                        <div class="tier-points">0 pts</div>
+                    </div>
+                    <div class="tier-indicator active">
+                        <div class="tier-dot">S</div>
+                        <div class="tier-name">Silver</div>
+                        <div class="tier-points">500 pts</div>
+                    </div>
+                    <div class="tier-indicator">
+                        <div class="tier-dot">G</div>
+                        <div class="tier-name">Gold</div>
+                        <div class="tier-points">1000 pts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rewards Stats -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Available Points</h5>
+                            <h2 class="text-warning" id="availablePoints">850</h2>
+                            <p class="text-muted mb-0">Total points earned</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Rewards Earned</h5>
+                            <h2 class="text-success" id="rewardsEarned">12</h2>
+                            <p class="text-muted mb-0">Total rewards</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body text-center">
+                            <h5>Current Tier</h5>
+                            <h2 class="text-info" id="currentTier">Silver</h2>
+                            <p class="text-muted mb-0">Reward level</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Available Rewards -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gift me-2"></i>Available Rewards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="rewardsList">
+                        <!-- Rewards will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Redeemed Rewards -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Redeemed Rewards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="redeemedRewardsList">
+                        <!-- Redeemed rewards will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div id="map-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-map me-2"></i>Service Area</h2>
+                <button class="btn btn-primary" onclick="refreshMap()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div id="mapContainer">
+                        <p class="text-muted">Interactive map would be displayed here</p>
+                    </div>
+                    <div class="mt-3">
+                        <h5>Today's Pickup Locations</h5>
+                        <div class="list-group" id="mapLocationsList">
+                            <!-- Map locations will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-person me-2"></i>My Profile</h2>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="user-avatar mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <h4 id="profileCollectorName">Michael Johnson</h4>
+                            <p class="text-muted">Waste Collector</p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary">Change Photo</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Account Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Member Since:</strong> January 2023
+                            </div>
+                            <div class="mb-3">
+                                <strong>Total Jobs:</strong> 342
+                            </div>
+                            <div class="mb-3">
+                                <strong>Rating:</strong> 4.8/5 (128 reviews)
+                            </div>
+                            <div>
+                                <strong>Service Area:</strong> Eco City & Greenville
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Edit Profile</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" value="Michael">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" value="Johnson">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" value="michael.johnson@example.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" value="(555) 123-4567">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" rows="2">123 Collector Street, Eco City</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="vehicle" class="form-label">Vehicle Type</label>
+                                    <select class="form-select" id="vehicle">
+                                        <option selected>Small Truck</option>
+                                        <option>Medium Truck</option>
+                                        <option>Large Truck</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section" class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="bi bi-gear me-2"></i>Settings</h2>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-settings-tab="notifications">Notifications</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-settings-tab="privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-settings-tab="account">Account</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div id="notifications-settings">
+                        <h5>Notification Preferences</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="newRequests" checked>
+                            <label class="form-check-label" for="newRequests">New pickup requests</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="scheduleChanges" checked>
+                            <label class="form-check-label" for="scheduleChanges">Schedule changes</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="earningUpdates">
+                            <label class="form-check-label" for="earningUpdates">Earning updates</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="ratingNotifications" checked>
+                            <label class="form-check-label" for="ratingNotifications">New ratings</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="rewardNotifications" checked>
+                            <label class="form-check-label" for="rewardNotifications">Reward updates</label>
+                        </div>
+                        <button class="btn btn-primary">Save Preferences</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pickup Details Modal -->
+    <div class="modal fade" id="pickupDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pickup Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <p><strong>Name:</strong> <span id="modalCustomerName">John Doe</span></p>
+                            <p><strong>Phone:</strong> <span id="modalCustomerPhone">(555) 123-4567</span></p>
+                            <p><strong>Email:</strong> <span id="modalCustomerEmail">john.doe@example.com</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Pickup Details</h6>
+                            <p><strong>Address:</strong> <span id="modalPickupAddress">123 Green Street, Eco City</span></p>
+                            <p><strong>Waste Type:</strong> <span id="modalWasteType">Household</span></p>
+                            <p><strong>Estimated Weight:</strong> <span id="modalEstimatedWeight">15 kg</span></p>
+                            <p><strong>Preferred Time:</strong> <span id="modalPreferredTime">9:00 AM - 12:00 PM</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Special Instructions</h6>
+                        <p id="modalSpecialInstructions">Please ring the doorbell upon arrival. The waste bins are located at the back of the house.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="modalAcceptButton">Accept Pickup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reward Details Modal -->
+    <div class="modal fade" id="rewardDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reward Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="reward-image-container">
+                                <img id="modalRewardImage" src="" alt="Reward" class="reward-image">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="modalRewardName">Reward Name</h4>
+                            <p class="text-muted" id="modalRewardDescription">Reward description goes here</p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold">Points Required:</span>
+                                <span class="badge bg-warning text-dark fs-6" id="modalRewardPoints">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold">Your Points:</span>
+                                <span class="text-warning fw-bold" id="modalUserPoints">0</span>
+                            </div>
+                            <div id="modalRewardStatus"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-reward" id="modalRedeemButton">Redeem Reward</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Application State
+        const appState = {
+            user: {
+                id: 1,
+                name: "Michael Johnson",
+                email: "michael.johnson@example.com",
+                phone: "(555) 123-4567",
+                address: "123 Collector Street, Eco City",
+                vehicle: "Small Truck",
+                memberSince: "January 2023",
+                totalJobs: 342,
+                rating: 4.8,
+                reviewCount: 128,
+                serviceArea: "Eco City & Greenville",
+                points: 850,
+                tier: "silver"
+            },
+            pickups: [
+                {
+                    id: 1,
+                    customer: "John Doe",
+                    phone: "(555) 123-4567",
+                    email: "john.doe@example.com",
+                    address: "123 Green Street, Eco City",
+                    wasteType: "Household",
+                    estimatedWeight: "15 kg",
+                    preferredTime: "9:00 AM - 12:00 PM",
+                    specialInstructions: "Please ring the doorbell upon arrival. The waste bins are located at the back of the house.",
+                    status: "pending",
+                    requested: "Today, 9:30 AM"
+                },
+                {
+                    id: 2,
+                    customer: "Sarah Wilson",
+                    phone: "(555) 987-6543",
+                    email: "sarah.wilson@example.com",
+                    address: "456 Eco Avenue, Greenville",
+                    wasteType: "Recycling",
+                    estimatedWeight: "8 kg",
+                    preferredTime: "10:00 AM - 1:00 PM",
+                    specialInstructions: "Recycling bins are at the front gate. Please separate plastic and paper.",
+                    status: "pending",
+                    requested: "Today, 10:15 AM"
+                },
+                {
+                    id: 3,
+                    customer: "Robert Brown",
+                    phone: "(555) 456-7890",
+                    email: "robert.brown@example.com",
+                    address: "789 Nature Road, Eco City",
+                    wasteType: "Organic",
+                    estimatedWeight: "12 kg",
+                    preferredTime: "11:00 AM - 2:00 PM",
+                    specialInstructions: "Compost bin is in the backyard. Gate is unlocked.",
+                    status: "accepted",
+                    requested: "Yesterday, 3:45 PM"
+                }
+            ],
+            schedule: [
+                {
+                    id: 1,
+                    title: "Green Street Collection",
+                    time: "9:00 AM - 10:30 AM",
+                    location: "123 Green Street, Eco City",
+                    status: "completed"
+                },
+                {
+                    id: 2,
+                    title: "Eco Avenue Pickup",
+                    time: "11:00 AM - 12:00 PM",
+                    location: "456 Eco Avenue, Greenville",
+                    status: "in-progress"
+                },
+                {
+                    id: 3,
+                    title: "Recycling Center Drop-off",
+                    time: "1:30 PM - 2:30 PM",
+                    location: "Recycling Center, Industrial Area",
+                    status: "scheduled"
+                }
+            ],
+            rewards: [
+                {
+                    id: 1,
+                    name: "$50 Fuel Card",
+                    description: "Redeemable at any major gas station",
+                    points: 500,
+                    tier: "silver",
+                    image: "https://via.placeholder.com/300x200/FFD700/000000?text=Fuel+Card",
+                    redeemed: false
+                },
+                {
+                    id: 2,
+                    name: "Premium Work Gloves",
+                    description: "Durable gloves for waste collection",
+                    points: 300,
+                    tier: "bronze",
+                    image: "https://via.placeholder.com/300x200/C0C0C0/000000?text=Work+Gloves",
+                    redeemed: false
+                },
+                {
+                    id: 3,
+                    name: "SmartWaste Jacket",
+                    description: "Official collector jacket with reflective strips",
+                    points: 800,
+                    tier: "silver",
+                    image: "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Collector+Jacket",
+                    redeemed: false
+                },
+                {
+                    id: 4,
+                    name: "Mobile Power Bank",
+                    description: "High-capacity power bank for your devices",
+                    points: 400,
+                    tier: "bronze",
+                    image: "https://via.placeholder.com/300x200/2196F3/FFFFFF?text=Power+Bank",
+                    redeemed: true
+                },
+                {
+                    id: 5,
+                    name: "Performance Bonus",
+                    description: "$100 cash bonus for excellent service",
+                    points: 1000,
+                    tier: "gold",
+                    image: "https://via.placeholder.com/300x200/FF9800/FFFFFF?text=Bonus",
+                    redeemed: false
+                }
+            ],
+            redeemedRewards: [
+                {
+                    id: 4,
+                    name: "Mobile Power Bank",
+                    description: "High-capacity power bank for your devices",
+                    points: 400,
+                    tier: "bronze",
+                    image: "https://via.placeholder.com/300x200/2196F3/FFFFFF?text=Power+Bank",
+                    redeemedDate: "2024-01-15"
+                }
+            ]
+        };
+
+        // DOM Elements
+        const menuItems = document.querySelectorAll('.menu-item');
+        const dashboardSections = document.querySelectorAll('.dashboard-section');
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active section
+            showSection('dashboard');
+            
+            // Load initial data
+            loadUserData();
+            loadPickups();
+            loadSchedule();
+            loadRewards();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Show welcome toast
+            showToast('Welcome back to your SmartWaste Collector Dashboard!', 'success');
+        });
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Menu item clicks
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Update active menu item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Quick action buttons
+            document.querySelectorAll('.btn[data-section]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Update active menu item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    document.querySelector(`.menu-item[data-section="${section}"]`).classList.add('active');
+                });
+            });
+            
+            // Schedule tabs
+            document.querySelectorAll('[data-schedule]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('[data-schedule]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    loadSchedule(this.getAttribute('data-schedule'));
+                });
+            });
+            
+            // Performance period buttons
+            document.querySelectorAll('[data-period]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadPerformanceData(this.getAttribute('data-period'));
+                });
+            });
+            
+            // Earnings period buttons
+            document.querySelectorAll('[data-earnings-period]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-earnings-period]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadEarningsData(this.getAttribute('data-earnings-period'));
+                });
+            });
+            
+            // Rewards filter buttons
+            document.querySelectorAll('[data-rewards-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-rewards-filter]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterRewards(this.getAttribute('data-rewards-filter'));
+                });
+            });
+            
+            // Settings tabs
+            document.querySelectorAll('[data-settings-tab]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('[data-settings-tab]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    showSettingsTab(this.getAttribute('data-settings-tab'));
+                });
+            });
+            
+            // Profile form submission
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateProfile();
+            });
+            
+            // Menu toggle for mobile
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
+        
+        // Show a specific section
+        function showSection(sectionName) {
+            dashboardSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${sectionName}-section`).classList.add('active');
+            
+            // Load section-specific data
+            switch(sectionName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'pickups':
+                    loadAllPickups();
+                    break;
+                case 'rewards':
+                    loadRewards();
+                    break;
+                case 'earnings':
+                    loadEarningsData('week');
+                    break;
+                case 'performance':
+                    loadPerformanceData('week');
+                    break;
+            }
+        }
+        
+        // Load user data
+        function loadUserData() {
+            document.getElementById('collectorName').textContent = appState.user.name;
+            document.getElementById('profileCollectorName').textContent = appState.user.name;
+            document.getElementById('firstName').value = appState.user.name.split(' ')[0];
+            document.getElementById('lastName').value = appState.user.name.split(' ')[1];
+            document.getElementById('email').value = appState.user.email;
+            document.getElementById('phone').value = appState.user.phone;
+            document.getElementById('address').value = appState.user.address;
+            document.getElementById('vehicle').value = appState.user.vehicle;
+            
+            // Update reward points
+            document.getElementById('rewardPoints').textContent = appState.user.points;
+            document.getElementById('availablePoints').textContent = appState.user.points;
+            document.getElementById('currentTier').textContent = appState.user.tier.charAt(0).toUpperCase() + appState.user.tier.slice(1);
+        }
+        
+        // Load pickup requests
+        function loadPickups() {
+            const pendingPickups = appState.pickups.filter(p => p.status === 'pending');
+            const acceptedPickups = appState.pickups.filter(p => p.status === 'accepted');
+            const completedPickups = appState.pickups.filter(p => p.status === 'completed');
+            
+            // Update stats
+            document.getElementById('pendingCount').textContent = pendingPickups.length;
+            document.getElementById('acceptedCount').textContent = acceptedPickups.length;
+            document.getElementById('completedCount').textContent = completedPickups.length;
+            
+            // Update notification badges
+            document.getElementById('pickupNotification').textContent = pendingPickups.length;
+            
+            // Load pending pickups for dashboard
+            loadPendingPickups();
+        }
+        
+        // Load pending pickups for dashboard
+        function loadPendingPickups() {
+            const container = document.getElementById('pendingPickupsList');
+            const pendingPickups = appState.pickups.filter(p => p.status === 'pending');
+            
+            if (pendingPickups.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-check-circle"></i>
+                        <h5>No Pending Pickups</h5>
+                        <p class="text-muted">All pickup requests have been processed.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = pendingPickups.map(pickup => `
+                <div class="card pickup-card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h5 class="mb-0 me-3">${pickup.wasteType} Pickup</h5>
+                                    <span class="badge badge-pending text-white">Pending</span>
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-geo-alt me-1"></i>${pickup.address}
+                                </p>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <small><i class="bi bi-person me-1"></i>${pickup.customer}</small>
+                                    <small><i class="bi bi-telephone me-1"></i>${pickup.phone}</small>
+                                    <small><i class="bi bi-clock me-1"></i>Requested: ${pickup.requested}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="btn-group w-100 w-md-auto">
+                                    <button class="btn btn-success btn-sm" onclick="acceptPickup(${pickup.id})">
+                                        <i class="bi bi-check-lg me-1"></i>Accept
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="viewDetails(${pickup.id})">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load all pickups for pickups section
+        function loadAllPickups() {
+            const container = document.getElementById('allPickupsTable');
+            
+            container.innerHTML = appState.pickups.map(pickup => `
+                <tr>
+                    <td>#00${pickup.id}</td>
+                    <td>${pickup.customer}</td>
+                    <td>${pickup.address}</td>
+                    <td>${pickup.wasteType}</td>
+                    <td><span class="badge ${pickup.status === 'pending' ? 'bg-warning' : pickup.status === 'accepted' ? 'bg-primary' : 'bg-success'}">${pickup.status.charAt(0).toUpperCase() + pickup.status.slice(1)}</span></td>
+                    <td>${pickup.requested}</td>
+                    <td>
+                        ${pickup.status === 'pending' ? 
+                            `<button class="btn btn-success btn-sm" onclick="acceptPickup(${pickup.id})">Accept</button>` : 
+                            pickup.status === 'accepted' ? 
+                            `<button class="btn btn-warning btn-sm" onclick="completePickup(${pickup.id})">Complete</button>` : 
+                            `<button class="btn btn-outline-secondary btn-sm" disabled>Completed</button>`
+                        }
+                        <button class="btn btn-outline-secondary btn-sm" onclick="viewDetails(${pickup.id})">Details</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load schedule
+        function loadSchedule(period = 'today') {
+            const container = document.getElementById('scheduleList');
+            
+            // Filter schedule based on period (in a real app, this would be more complex)
+            const filteredSchedule = appState.schedule;
+            
+            if (filteredSchedule.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-calendar-x"></i>
+                        <h5>No Schedule Items</h5>
+                        <p class="text-muted">No schedule items for the selected period.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredSchedule.map(item => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${item.title}</h6>
+                        <small class="text-muted">${item.time}</small>
+                        <p class="mb-0 mt-1"><i class="bi bi-geo-alt me-1"></i>${item.location}</p>
+                    </div>
+                    <span class="badge ${item.status === 'completed' ? 'bg-success' : item.status === 'in-progress' ? 'bg-primary' : 'bg-secondary'}">
+                        ${item.status === 'completed' ? 'Completed' : item.status === 'in-progress' ? 'In Progress' : 'Scheduled'}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        // Load rewards
+        function loadRewards() {
+            const availableRewards = appState.rewards.filter(r => !r.redeemed);
+            const redeemedRewards = appState.redeemedRewards;
+            
+            // Update stats
+            document.getElementById('rewardsEarned').textContent = redeemedRewards.length;
+            
+            // Show/hide notification badge
+            const rewardNotification = document.getElementById('rewardNotification');
+            if (availableRewards.length > 0) {
+                rewardNotification.style.display = 'flex';
+                rewardNotification.textContent = availableRewards.length;
+            } else {
+                rewardNotification.style.display = 'none';
+            }
+            
+            // Load available rewards
+            const rewardsContainer = document.getElementById('rewardsList');
+            if (availableRewards.length === 0) {
+                rewardsContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <i class="bi bi-gift"></i>
+                            <h5>No Available Rewards</h5>
+                            <p class="text-muted">Complete more pickups to earn reward points!</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rewardsContainer.innerHTML = availableRewards.map(reward => `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card reward-card h-100">
+                            <div class="reward-image-container">
+                                <img src="${reward.image}" alt="${reward.name}" class="reward-image">
+                                <span class="reward-tier-badge ${reward.tier === 'gold' ? 'tier-gold' : reward.tier === 'silver' ? 'tier-silver' : 'tier-bronze'}">
+                                    ${reward.tier.charAt(0).toUpperCase()}
+                                </span>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${reward.name}</h5>
+                                <p class="card-text text-muted flex-grow-1">${reward.description}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="badge bg-warning text-dark">${reward.points} pts</span>
+                                    <button class="btn btn-reward btn-sm" onclick="viewRewardDetails(${reward.id})">
+                                        <i class="bi bi-gift me-1"></i>Redeem
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Load redeemed rewards
+            const redeemedContainer = document.getElementById('redeemedRewardsList');
+            if (redeemedRewards.length === 0) {
+                redeemedContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <i class="bi bi-check-circle"></i>
+                            <h5>No Redeemed Rewards</h5>
+                            <p class="text-muted">You haven't redeemed any rewards yet.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                redeemedContainer.innerHTML = redeemedRewards.map(reward => `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card reward-card h-100">
+                            <div class="reward-image-container">
+                                <img src="${reward.image}" alt="${reward.name}" class="reward-image">
+                                <span class="reward-tier-badge ${reward.tier === 'gold' ? 'tier-gold' : reward.tier === 'silver' ? 'tier-silver' : 'tier-bronze'}">
+                                    ${reward.tier.charAt(0).toUpperCase()}
+                                </span>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${reward.name}</h5>
+                                <p class="card-text text-muted flex-grow-1">${reward.description}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="badge bg-secondary">${reward.points} pts</span>
+                                    <small class="text-muted">Redeemed: ${reward.redeemedDate}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Filter rewards
+        function filterRewards(filter) {
+            // This would filter the rewards display based on the selected filter
+            // For now, we'll just reload all rewards
+            loadRewards();
+        }
+        
+        // Load dashboard data
+        function loadDashboardData() {
+            loadTodaySchedule();
+        }
+        
+        // Load today's schedule for dashboard
+        function loadTodaySchedule() {
+            const container = document.getElementById('todayScheduleList');
+            const todaySchedule = appState.schedule;
+            
+            if (todaySchedule.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-calendar-x"></i>
+                        <h5>No Schedule Today</h5>
+                        <p class="text-muted">You have no scheduled pickups for today.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = todaySchedule.map(item => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${item.title}</h6>
+                        <small class="text-muted">${item.time}</small>
+                    </div>
+                    <span class="badge ${item.status === 'completed' ? 'bg-success' : item.status === 'in-progress' ? 'bg-primary' : 'bg-secondary'}">
+                        ${item.status === 'completed' ? 'Completed' : item.status === 'in-progress' ? 'In Progress' : 'Scheduled'}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        // Load performance data
+        function loadPerformanceData(period) {
+            // This would load performance data based on the selected period
+            // For now, we'll just show a message
+            console.log(`Loading performance data for ${period}`);
+        }
+        
+        // Load earnings data
+        function loadEarningsData(period) {
+            // This would load earnings data based on the selected period
+            // For now, we'll just show a message
+            console.log(`Loading earnings data for ${period}`);
+        }
+        
+        // Show settings tab
+        function showSettingsTab(tab) {
+            // This would show the appropriate settings tab content
+            // For now, we'll just show a message
+            console.log(`Showing settings tab: ${tab}`);
+        }
+        
+        // Update profile
+        function updateProfile() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const vehicle = document.getElementById('vehicle').value;
+            
+            // Update user data
+            appState.user.name = `${firstName} ${lastName}`;
+            appState.user.email = email;
+            appState.user.phone = phone;
+            appState.user.address = address;
+            appState.user.vehicle = vehicle;
+            
+            // Update UI
+            loadUserData();
+            
+            // Show success message
+            showToast('Profile updated successfully!', 'success');
+        }
+        
+        // Function stubs for dashboard functionality
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function showTodaySchedule() {
+            showSection('schedule');
+        }
+        
+        function acceptPickup(id) {
+            if (confirm('Accept this pickup request?')) {
+                const pickup = appState.pickups.find(p => p.id === id);
+                if (pickup) {
+                    pickup.status = 'accepted';
+                    
+                    // Update stats
+                    loadPickups();
+                    loadAllPickups();
+                    
+                    // Show success message
+                    showToast(`Pickup request #${id} accepted!`, 'success');
+                    
+                    // Add reward points
+                    appState.user.points += 50;
+                    loadUserData();
+                    
+                    // Check for new rewards
+                    checkForNewRewards();
+                }
+            }
+        }
+        
+        function completePickup(id) {
+            if (confirm('Mark this pickup as completed?')) {
+                const pickup = appState.pickups.find(p => p.id === id);
+                if (pickup) {
+                    pickup.status = 'completed';
+                    
+                    // Update stats
+                    loadPickups();
+                    loadAllPickups();
+                    
+                    // Show success message
+                    showToast(`Pickup request #${id} completed!`, 'success');
+                    
+                    // Add reward points
+                    appState.user.points += 100;
+                    loadUserData();
+                    
+                    // Check for new rewards
+                    checkForNewRewards();
+                }
+            }
+        }
+        
+        function viewDetails(id) {
+            const pickup = appState.pickups.find(p => p.id === id);
+            if (pickup) {
+                // Populate modal with pickup details
+                document.getElementById('modalCustomerName').textContent = pickup.customer;
+                document.getElementById('modalCustomerPhone').textContent = pickup.phone;
+                document.getElementById('modalCustomerEmail').textContent = pickup.email;
+                document.getElementById('modalPickupAddress').textContent = pickup.address;
+                document.getElementById('modalWasteType').textContent = pickup.wasteType;
+                document.getElementById('modalEstimatedWeight').textContent = pickup.estimatedWeight;
+                document.getElementById('modalPreferredTime').textContent = pickup.preferredTime;
+                document.getElementById('modalSpecialInstructions').textContent = pickup.specialInstructions;
+                
+                // Set up accept button
+                const acceptButton = document.getElementById('modalAcceptButton');
+                if (pickup.status === 'pending') {
+                    acceptButton.style.display = 'block';
+                    acceptButton.onclick = function() {
+                        acceptPickup(id);
+                        bootstrap.Modal.getInstance(document.getElementById('pickupDetailsModal')).hide();
+                    };
+                } else {
+                    acceptButton.style.display = 'none';
+                }
+                
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('pickupDetailsModal'));
+                modal.show();
+            }
+        }
+        
+        function viewRewardDetails(id) {
+            const reward = appState.rewards.find(r => r.id === id);
+            if (reward) {
+                // Populate modal with reward details
+                document.getElementById('modalRewardImage').src = reward.image;
+                document.getElementById('modalRewardImage').alt = reward.name;
+                document.getElementById('modalRewardName').textContent = reward.name;
+                document.getElementById('modalRewardDescription').textContent = reward.description;
+                document.getElementById('modalRewardPoints').textContent = reward.points;
+                document.getElementById('modalUserPoints').textContent = appState.user.points;
+                
+                // Set up redeem button and status
+                const redeemButton = document.getElementById('modalRedeemButton');
+                const statusDiv = document.getElementById('modalRewardStatus');
+                
+                if (reward.redeemed) {
+                    statusDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>You have already redeemed this reward</div>';
+                    redeemButton.style.display = 'none';
+                } else if (appState.user.points >= reward.points) {
+                    statusDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>You have enough points to redeem this reward</div>';
+                    redeemButton.style.display = 'block';
+                    redeemButton.onclick = function() {
+                        redeemReward(id);
+                        bootstrap.Modal.getInstance(document.getElementById('rewardDetailsModal')).hide();
+                    };
+                } else {
+                    const pointsNeeded = reward.points - appState.user.points;
+                    statusDiv.innerHTML = `<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>You need ${pointsNeeded} more points to redeem this reward</div>`;
+                    redeemButton.style.display = 'none';
+                }
+                
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('rewardDetailsModal'));
+                modal.show();
+            }
+        }
+        
+        function redeemReward(id) {
+            const reward = appState.rewards.find(r => r.id === id);
+            if (reward && !reward.redeemed && appState.user.points >= reward.points) {
+                // Deduct points
+                appState.user.points -= reward.points;
+                
+                // Mark as redeemed
+                reward.redeemed = true;
+                reward.redeemedDate = new Date().toISOString().split('T')[0];
+                
+                // Move to redeemed rewards
+                appState.redeemedRewards.push(reward);
+                
+                // Update UI
+                loadUserData();
+                loadRewards();
+                
+                // Show success message
+                showToast(`Congratulations! You've redeemed ${reward.name}.`, 'success');
+            }
+        }
+        
+        function checkForNewRewards() {
+            // Check if user has reached a new tier
+            const oldTier = appState.user.tier;
+            let newTier = oldTier;
+            
+            if (appState.user.points >= 1000) {
+                newTier = 'gold';
+            } else if (appState.user.points >= 500) {
+                newTier = 'silver';
+            } else {
+                newTier = 'bronze';
+            }
+            
+            if (newTier !== oldTier) {
+                appState.user.tier = newTier;
+                showToast(`Congratulations! You've reached ${newTier} tier!`, 'success');
+                loadUserData();
+            }
+        }
+        
+        function refreshMap() {
+            showToast('Map data refreshed!', 'info');
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.id = toastId;
+            
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toastEl);
+            
+            const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+            toast.show();
+            
+            // Remove toast from DOM after it's hidden
+            toastEl.addEventListener('hidden.bs.toast', () => {
+                toastEl.remove();
+            });
+        }
+    </script>
+    <script src="dashboard-collector.js"></script>
+</body>
+</html>

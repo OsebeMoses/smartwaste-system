@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWaste - Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --light-green: #e8f5e9;
+            --medium-green: #4caf50;
+            --dark-green: #2e7d32;
+            --accent-green: #81c784;
+            --white: #ffffff;
+            --black: #1b1b1b;
+            --light-gray: #f5f5f5;
+            --text-dark: #333333;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--accent-green) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .hero-section {
+            padding: 2rem;
+        }
+        
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features-list i {
+            color: var(--medium-green);
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: var(--white);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%);
+            border: none;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            background: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-icon i {
+            font-size: 1.8rem;
+            color: var(--dark-green);
+        }
+        
+        .logo-text {
+            color: var(--white);
+        }
+        
+        .logo-text h3 {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo-text p {
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 2rem 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--medium-green);
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.85rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+        
+        .form-text {
+            color: #757575;
+            font-size: 0.875rem;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #9e9e9e;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .features-list {
+                text-align: left;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Hero Section -->
+            <div class="col-lg-6">
+                <div class="hero-section">
+                    <h1 class="hero-title">Join SmartWaste Today</h1>
+                    <p class="hero-subtitle">Create your account and start making a difference in your community's waste management.</p>
+                    
+                    <ul class="features-list">
+                        <li><i class="bi bi-check-circle-fill"></i><span>Easy waste pickup scheduling</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i><span>Track your environmental impact</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i><span>Earn rewards for recycling</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i><span>Connect with local collectors</span></li>
+                    </ul>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield-check me-2" style="color: var(--dark-green); font-size: 1.5rem;"></i>
+                            <div>
+                                <h5 class="mb-0">Secure & Reliable</h5>
+                                <small class="text-muted">Your data is protected with enterprise-grade security</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Register Card -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="logo-container">
+                            <div class="logo-icon">
+                                <i class="bi bi-trash-fill"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h3>SmartWaste</h3>
+                                <p>Create Your Account</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="regName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="regName" required placeholder="Enter your full name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="regEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="regEmail" required placeholder="Enter your email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="regPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="regPhone" required placeholder="Enter your phone number">
+                            </div>
+                            <div class="mb-3">
+                                <label for="regPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="regPassword" required placeholder="Create a password">
+                                <div class="form-text">Password must be at least 6 characters long</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="regRole" class="form-label">I am a...</label>
+                                <select class="form-select" id="regRole">
+                                    <option value="user">Resident (I need waste pickup)</option>
+                                    <option value="collector">Waste Collector</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    I agree to the <a href="#" style="color: var(--dark-green);">Terms of Service</a> and <a href="#" style="color: var(--dark-green);">Privacy Policy</a>
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100 py-2 mb-3">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
+                        </form>
+
+                        <div class="divider"><span>or</span></div>
+
+                        <div class="text-center">
+                            <p class="mb-0">Already have an account? <a href="login.html" class="fw-bold" style="color: var(--dark-green);">Login here</a></p>
+                        </div>
+
+                        <!-- Alert Messages -->
+                        <div id="alertBox" class="alert mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Main initialization function - runs when DOM is fully loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("SmartWaste Register Page Initialized");
+            
+            // Get DOM elements
+            const registerForm = document.getElementById("registerForm");
+            const alertBox = document.getElementById("alertBox");
+            
+            // Initialize register form handler
+            initializeRegisterForm();
+            
+            /**
+             * Initialize registration form with validation and submission handler
+             */
+            function initializeRegisterForm() {
+                if (registerForm) {
+                    registerForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        console.log("Register form submitted");
+                        
+                        // Get form values
+                        const name = document.getElementById('regName').value;
+                        const email = document.getElementById('regEmail').value;
+                        const phone = document.getElementById('regPhone').value;
+                        const password = document.getElementById('regPassword').value;
+                        const role = document.getElementById('regRole').value;
+                        const agreeTerms = document.getElementById('agreeTerms').checked;
+                        const registerButton = this.querySelector('button[type="submit"]');
+                        
+                        // Validate form inputs
+                        if (!validateRegisterForm(name, email, phone, password, agreeTerms)) {
+                            return;
+                        }
+                        
+                        // Process registration
+                        await processRegistration(name, email, phone, password, role, registerButton);
+                    });
+                }
+            }
+            
+            /**
+             * Validate registration form inputs
+             */
+            function validateRegisterForm(name, email, phone, password, agreeTerms) {
+                // Check if fields are filled
+                if (!name || !email || !phone || !password) {
+                    showAlert('Please fill in all fields', 'danger');
+                    return false;
+                }
+                
+                // Check password length
+                if (password.length < 6) {
+                    showAlert('Password must be at least 6 characters long', 'danger');
+                    return false;
+                }
+                
+                // Check if terms are accepted
+                if (!agreeTerms) {
+                    showAlert('Please agree to the Terms of Service and Privacy Policy', 'danger');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            /**
+             * Process user registration
+             */
+            async function processRegistration(name, email, phone, password, role, button) {
+                // Set loading state
+                setLoadingState(button, true);
+                hideAlert();
+                
+                try {
+                    console.log("📝 Attempting registration for:", email);
+                    
+                    // Make API call to register endpoint
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            name, 
+                            email, 
+                            phone, 
+                            password, 
+                            role 
+                        })
+                    });
+
+                    console.log("📊 Register response status:", response.status);
+                    
+                    const data = await response.json();
+                    console.log("📦 Register response data:", data);
+
+                    if (response.ok && data.success) {
+                        console.log("✅ Registration successful");
+                        
+                        // Save token and user data to localStorage
+                        if (data.data && data.data.token) {
+                            localStorage.setItem('token', data.data.token);
+                            localStorage.setItem('user', JSON.stringify(data.data));
+                            
+                            // Verify storage
+                            const savedToken = localStorage.getItem('token');
+                            const savedUser = localStorage.getItem('user');
+                            
+                            console.log("💾 Storage verification:", {
+                                tokenSaved: !!savedToken,
+                                userSaved: !!savedUser
+                            });
+
+                            if (!savedToken) {
+                                throw new Error('Token not saved to localStorage');
+                            }
+
+                            showAlert('✅ Registration successful! Redirecting...', 'success');
+                            
+                            // Redirect based on role
+                            setTimeout(() => {
+                                const userRole = data.data.role || 'user';
+                                const dashboard = userRole === 'admin' ? 'dashboard-admin.html' :
+                                                userRole === 'collector' ? 'dashboard-collector.html' :
+                                                'dashboard-user.html';
+                                console.log('🔄 Redirecting to:', dashboard);
+                                window.location.href = dashboard;
+                            }, 1500);
+                            
+                        } else {
+                            throw new Error('Registration response missing token data');
+                        }
+                    } else {
+                        throw new Error(data.message || 'Registration failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Registration error:', error);
+                    showAlert('❌ Registration failed: ' + error.message, 'danger');
+                    setLoadingState(button, false);
+                }
+            }
+            
+            /**
+             * Show alert message
+             */
+            function showAlert(message, type = 'danger') {
+                if (alertBox) {
+                    alertBox.textContent = message;
+                    alertBox.className = `alert alert-${type} mt-3`;
+                    alertBox.style.display = 'block';
+                    
+                    // Auto-hide success messages after 5 seconds
+                    if (type === 'success') {
+                        setTimeout(hideAlert, 5000);
+                    }
+                }
+            }
+            
+            /**
+             * Hide alert message
+             */
+            function hideAlert() {
+                if (alertBox) {
+                    alertBox.style.display = 'none';
+                }
+            }
+            
+            /**
+             * Set loading state for buttons
+             */
+            function setLoadingState(button, isLoading) {
+                if (!button) return;
+                
+                if (isLoading) {
+                    // Save original button text and show loading state
+                    button.disabled = true;
+                    const originalText = button.innerHTML;
+                    button.setAttribute('data-original-text', originalText);
+                    button.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Creating account...
+                    `;
+                } else {
+                    // Restore original button text
+                    button.disabled = false;
+                    const originalText = button.getAttribute('data-original-text');
+                    if (originalText) {
+                        button.innerHTML = originalText;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
