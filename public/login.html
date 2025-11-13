@@ -17,7 +17,7 @@
             --light-gray: #f5f5f5;
             --text-dark: #333333;
         }
-        
+
         body {
             background: linear-gradient(135deg, var(--light-green) 0%, var(--accent-green) 100%);
             min-height: 100vh;
@@ -195,6 +195,30 @@
         .divider span {
             padding: 0 1rem;
         }
+
+        /* Password input group */
+        .password-input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.3s;
+        }
+
+        .password-toggle:hover {
+            color: var(--dark-green);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
         
         @media (max-width: 768px) {
             .hero-section {
@@ -263,7 +287,12 @@
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" required placeholder="Enter your password">
+                                <div class="password-input-group">
+                                    <input type="password" class="form-control" id="password" required placeholder="Enter your password">
+                                    <button type="button" class="password-toggle" id="passwordToggle">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                                 <div class="form-text">Must be at least 6 characters long</div>
                             </div>
                             
@@ -293,53 +322,74 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Main initialization function - runs when DOM is fully loaded
+        // Password visibility toggle
+        function setupPasswordToggle() {
+            const passwordToggle = document.getElementById('passwordToggle');
+            const passwordInput = document.getElementById('password');
+            
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Toggle eye icon
+                    const icon = this.querySelector('i');
+                    if (type === 'text') {
+                        icon.className = 'bi bi-eye-slash';
+                    } else {
+                        icon.className = 'bi bi-eye';
+                    }
+                });
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             console.log("SmartWaste Login Page Initialized");
             
-            // Get DOM elements
             const loginForm = document.getElementById("loginForm");
             const alertBox = document.getElementById("alertBox");
             
-            // Initialize login form handler
+            // Setup password toggle
+            setupPasswordToggle();
+            
+            // Check if user is already logged in
+            checkExistingLogin();
+            
+            // Initialize login form
             initializeLoginForm();
             
-            /**
-             * Initialize login form with validation and submission handler
-             */
             function initializeLoginForm() {
                 if (loginForm) {
                     loginForm.addEventListener('submit', async function(e) {
                         e.preventDefault();
                         console.log("Login form submitted");
                         
-                        // Get form values
                         const email = document.getElementById('email').value;
                         const password = document.getElementById('password').value;
                         const loginButton = this.querySelector('button[type="submit"]');
                         
-                        // Validate form inputs
                         if (!validateLoginForm(email, password)) {
                             return;
                         }
                         
-                        // Process login
                         await processLogin(email, password, loginButton);
                     });
                 }
             }
             
-            /**
-             * Validate login form inputs
-             */
             function validateLoginForm(email, password) {
-                // Check if fields are filled
                 if (!email || !password) {
                     showAlert('Please fill in all fields', 'danger');
                     return false;
                 }
                 
-                // Check password length
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showAlert('Please enter a valid email address', 'danger');
+                    return false;
+                }
+                
                 if (password.length < 6) {
                     showAlert('Password must be at least 6 characters long', 'danger');
                     return false;
@@ -348,27 +398,33 @@
                 return true;
             }
             
-            /**
-             * Process user login
-             */
             async function processLogin(email, password, button) {
-                // Set loading state
                 setLoadingState(button, true);
                 hideAlert();
                 
                 try {
                     console.log("🔐 Attempting login for:", email);
                     
-                    // Make API call to login endpoint
                     const response = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify({ 
+                            email: email.trim().toLowerCase(), 
+                            password: password 
+                        })
                     });
 
                     console.log("📊 Login response status:", response.status);
+                    
+                    // Handle non-JSON responses
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const text = await response.text();
+                        console.error("Non-JSON response:", text);
+                        throw new Error('Server error: Invalid response format');
+                    }
                     
                     const data = await response.json();
                     console.log("📦 Login response data:", data);
@@ -376,13 +432,13 @@
                     if (response.ok && data.success) {
                         console.log("✅ Login successful");
                         
-                        // Save token and user data to localStorage
                         if (data.data && data.data.token) {
-                            localStorage.setItem('token', data.data.token);
+                            // Save to localStorage
+                            localStorage.setItem('authToken', data.data.token);
                             localStorage.setItem('user', JSON.stringify(data.data));
                             
                             // Verify storage
-                            const savedToken = localStorage.getItem('token');
+                            const savedToken = localStorage.getItem('authToken');
                             const savedUser = localStorage.getItem('user');
                             
                             console.log("💾 Storage verification:", {
@@ -398,11 +454,11 @@
                             
                             // Redirect based on role
                             setTimeout(() => {
-                                const role = data.data.role || 'user';
+                                const role = data.data.role || 'resident';
                                 const dashboard = role === 'admin' ? 'dashboard-admin.html' :
                                                 role === 'collector' ? 'dashboard-collector.html' :
                                                 'dashboard-user.html';
-                                console.log('🔄 Redirecting to:', dashboard);
+                                console.log('🔄 Redirecting to:', dashboard, 'for role:', role);
                                 window.location.href = dashboard;
                             }, 1500);
                             
@@ -410,22 +466,40 @@
                             throw new Error('Login response missing token data');
                         }
                     } else {
-                        throw new Error(data.message || 'Login failed');
+                        // Handle different error cases
+                        const errorMessage = data.message || 
+                                           data.error || 
+                                           `Login failed with status ${response.status}`;
+                        throw new Error(errorMessage);
                     }
                     
                 } catch (error) {
                     console.error('❌ Login error:', error);
-                    showAlert('❌ Login failed: ' + error.message, 'danger');
+                    
+                    // More specific error messages
+                    let userMessage = 'Login failed';
+                    if (error.message.includes('fetch') || error.message.includes('Network')) {
+                        userMessage = 'Network error: Cannot connect to server. Please check your connection.';
+                    } else if (error.message.includes('JSON')) {
+                        userMessage = 'Server error: Please try again later.';
+                    } else if (error.message.includes('401') || error.message.includes('Invalid credentials')) {
+                        userMessage = 'Invalid email or password. Please try again.';
+                    } else {
+                        userMessage = error.message;
+                    }
+                    
+                    showAlert('❌ ' + userMessage, 'danger');
                     setLoadingState(button, false);
                 }
             }
             
-            /**
-             * Show alert message
-             */
-            function showAlert(message, type = 'danger') {
+            function showAlert(message, type = 'danger', isHTML = false) {
                 if (alertBox) {
-                    alertBox.textContent = message;
+                    if (isHTML) {
+                        alertBox.innerHTML = message;
+                    } else {
+                        alertBox.textContent = message;
+                    }
                     alertBox.className = `alert alert-${type} mt-3`;
                     alertBox.style.display = 'block';
                     
@@ -433,26 +507,24 @@
                     if (type === 'success') {
                         setTimeout(hideAlert, 5000);
                     }
+                    
+                    // Auto-hide warning messages after 7 seconds
+                    if (type === 'warning') {
+                        setTimeout(hideAlert, 7000);
+                    }
                 }
             }
             
-            /**
-             * Hide alert message
-             */
             function hideAlert() {
                 if (alertBox) {
                     alertBox.style.display = 'none';
                 }
             }
             
-            /**
-             * Set loading state for buttons
-             */
             function setLoadingState(button, isLoading) {
                 if (!button) return;
                 
                 if (isLoading) {
-                    // Save original button text and show loading state
                     button.disabled = true;
                     const originalText = button.innerHTML;
                     button.setAttribute('data-original-text', originalText);
@@ -461,7 +533,6 @@
                         Signing in...
                     `;
                 } else {
-                    // Restore original button text
                     button.disabled = false;
                     const originalText = button.getAttribute('data-original-text');
                     if (originalText) {
@@ -469,6 +540,75 @@
                     }
                 }
             }
+
+            /**
+             * Check if user is already logged in
+             */
+            function checkExistingLogin() {
+                const token = localStorage.getItem('authToken');
+                const user = localStorage.getItem('user');
+                
+                if (token && user) {
+                    try {
+                        const userData = JSON.parse(user);
+                        console.log("👤 User already logged in:", userData.email);
+                        
+                        // Show option to redirect to dashboard with HTML links
+                        const alertMessage = `You are already logged in as <strong>${userData.email}</strong>. <a href="#" id="goToDashboard" class="alert-link">Go to Dashboard</a> or <a href="#" id="logoutLink" class="alert-link">Logout</a>`;
+                        showAlert(alertMessage, 'info', true);
+                        
+                        // Add event listeners for the links
+                        setTimeout(() => {
+                            const goToDashboard = document.getElementById('goToDashboard');
+                            const logoutLink = document.getElementById('logoutLink');
+                            
+                            if (goToDashboard) {
+                                goToDashboard.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    const role = userData.role || 'resident';
+                                    const dashboard = role === 'admin' ? 'dashboard-admin.html' :
+                                                    role === 'collector' ? 'dashboard-collector.html' :
+                                                    'dashboard-user.html';
+                                    window.location.href = dashboard;
+                                });
+                            }
+                            
+                            if (logoutLink) {
+                                logoutLink.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    localStorage.removeItem('authToken');
+                                    localStorage.removeItem('user');
+                                    hideAlert();
+                                    showAlert('You have been logged out.', 'success');
+                                    setTimeout(hideAlert, 3000);
+                                });
+                            }
+                        }, 100);
+                        
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                        // Clear invalid data
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('user');
+                    }
+                }
+            }
+
+            // Test localStorage availability
+            function testLocalStorage() {
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    return true;
+                } catch (e) {
+                    console.error('LocalStorage not available:', e);
+                    showAlert('Browser storage is disabled. Please enable localStorage for full functionality.', 'warning');
+                    return false;
+                }
+            }
+
+            // Run initialization functions
+            testLocalStorage();
         });
     </script>
 </body>

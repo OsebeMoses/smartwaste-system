@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartWaste - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
         :root {
             --primary: #10B981;
@@ -13,10 +15,10 @@
             --primary-dark: #059669;
             --secondary: #3B82F6;
             --accent: #F59E0B;
+            --danger: #EF4444;
             --success: #10B981;
             --warning: #F59E0B;
             --info: #3B82F6;
-            --danger: #EF4444;
             --dark: #0F172A;
             --dark-light: #1E293B;
             --dark-lighter: #334155;
@@ -96,13 +98,6 @@
         }
 
         /* Sidebar */
-        .sidebar {
-            position: sticky;
-            top: 1rem;
-            height: calc(100vh - 2rem);
-            overflow-y: auto;
-        }
-
         .avatar-circle {
             width: 80px;
             height: 80px;
@@ -118,7 +113,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin: 1.5rem 0;
         }
@@ -211,7 +206,55 @@
             font-size: 1.5rem;
         }
 
-        /* Form Elements */
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Tables */
+        .table {
+            color: var(--text-primary);
+        }
+
+        .table th {
+            border-color: var(--dark-lighter);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .table td {
+            border-color: var(--dark-lighter);
+            vertical-align: middle;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: var(--warning); color: white; }
+        .status-accepted { background: var(--info); color: white; }
+        .status-completed { background: var(--success); color: white; }
+        .status-cancelled { background: var(--gray); color: white; }
+        .status-in-progress { background: #8B5CF6; color: white; }
+        .status-active { background: var(--success); color: white; }
+        .status-inactive { background: var(--gray); color: white; }
+        .status-suspended { background: var(--danger); color: white; }
+
+        /* Map */
+        #analyticsMap {
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--dark-lighter);
+        }
+
+        /* Forms */
         .form-control, .form-select {
             border-radius: 12px;
             border: 2px solid var(--dark-lighter);
@@ -250,26 +293,6 @@
             color: white;
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #059669);
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning), #D97706);
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
         .btn-danger {
             background: linear-gradient(135deg, var(--danger), #DC2626);
             border: none;
@@ -280,17 +303,11 @@
             color: white;
         }
 
-        /* Badges */
-        .badge-tier {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+            color: white;
         }
-
-        .badge-bronze { background: linear-gradient(135deg, #CD7F32, #8B4513); color: white; }
-        .badge-silver { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); color: white; }
-        .badge-gold { background: linear-gradient(135deg, #FFD700, #D4AF37); color: white; }
 
         /* Progress Bars */
         .progress {
@@ -309,27 +326,10 @@
                 grid-template-columns: 1fr;
             }
             
-            .sidebar {
-                position: relative;
-                height: auto;
+            .welcome-banner .text-end {
+                text-align: left !important;
+                margin-top: 1rem;
             }
-        }
-
-        /* Notifications */
-        .notification-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 12px;
-            background: var(--dark-lighter);
-            margin-bottom: 0.75rem;
-            transition: all 0.3s ease;
-        }
-
-        .notification-item:hover {
-            background: var(--dark-light);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         /* Empty States */
@@ -345,146 +345,6 @@
             opacity: 0.5;
         }
 
-        /* Tables */
-        .table {
-            color: var(--text-primary);
-        }
-
-        .table th {
-            border-color: var(--dark-lighter);
-            color: var(--text-secondary);
-        }
-
-        .table td {
-            border-color: var(--dark-lighter);
-        }
-
-        /* Reward Cards */
-        .reward-card {
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            background: var(--dark-light);
-        }
-
-        .reward-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-light);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .reward-image-container {
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-        }
-
-        .reward-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .reward-card:hover .reward-image {
-            transform: scale(1.05);
-        }
-
-        .reward-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .points-badge {
-            font-size: 0.8rem;
-            padding: 6px 10px;
-        }
-
-        /* Rewards Section Header */
-        .rewards-header {
-            background: linear-gradient(135deg, var(--warning), var(--accent));
-            color: white;
-            padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .rewards-stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .reward-stat {
-            text-align: center;
-        }
-
-        .reward-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .reward-stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        /* Reward Categories */
-        .reward-categories {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            background: var(--dark-lighter);
-            border: 2px solid var(--dark-lighter);
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-        }
-
-        .category-btn.active,
-        .category-btn:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Toast */
-        .toast {
-            background-color: var(--dark-light);
-            color: var(--text-primary);
-            border: 1px solid var(--dark-lighter);
-        }
-
-        /* Charts */
-        .chart-container {
-            background: var(--dark-light);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .status-pending { background: var(--warning); color: white; }
-        .status-scheduled { background: var(--info); color: white; }
-        .status-completed { background: var(--success); color: white; }
-        .status-cancelled { background: var(--danger); color: white; }
-
         /* Animation for new items */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -495,49 +355,73 @@
             animation: fadeIn 0.5s ease-out;
         }
 
-        /* Admin Specific Styles */
-        .admin-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
+        /* Sidebar and Main Content Layout */
+        .sidebar {
+            position: sticky;
+            top: 1rem;
+            height: calc(100vh - 2rem);
+            overflow-y: auto;
         }
 
-        .admin-stat-card {
-            background: var(--dark-lighter);
-            padding: 1.5rem;
+        .main-content {
+            padding-left: 1rem;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                padding-left: 0;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Alerts */
+        .alert {
+            border: none;
             border-radius: 12px;
-            text-align: center;
-            transition: all 0.3s ease;
         }
 
-        .admin-stat-card:hover {
-            background: var(--dark-light);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        /* Dropdown */
+        .dropdown-menu {
+            background-color: var(--dark-light);
+            border: 1px solid var(--dark-lighter);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
-        .admin-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .dropdown-item {
+            color: var(--text-secondary);
         }
 
-        .admin-stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
+        .dropdown-item:hover {
+            background-color: var(--dark-lighter);
+            color: var(--text-primary);
         }
 
-        /* User Management */
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
+        /* Toast */
+        .toast {
+            background-color: var(--dark-light);
+            color: var(--text-primary);
+            border: 1px solid var(--dark-lighter);
+        }
+
+        /* Text Colors */
+        .text-primary { color: var(--primary) !important; }
+        .text-success { color: var(--success) !important; }
+        .text-warning { color: var(--warning) !important; }
+        .text-info { color: var(--info) !important; }
+        .text-danger { color: var(--danger) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--dark-lighter);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         /* Analytics Cards */
@@ -545,20 +429,39 @@
             background: var(--dark-light);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            height: 100%;
         }
 
-        .analytics-header {
+        .analytics-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .analytics-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Heatmap Legend */
+        .heatmap-legend {
+            background: var(--dark-lighter);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
             display: flex;
-            justify-content: between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
-        .analytics-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 0.5rem;
         }
     </style>
 </head>
@@ -584,13 +487,12 @@
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle me-2 fs-5"></i>
-                            <span id="adminName">Loading...</span>
+                            <span id="adminName">Administrator</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px;">
-                            <li><a class="dropdown-item" href="#" onclick="showSection('profile')"><i class="bi bi-person me-2"></i>My Profile</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="showSection('settings')"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="app.sectionManager.showSection('system-settings')"><i class="bi bi-gear me-2"></i>System Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -607,10 +509,10 @@
                         <div class="card-body">
                             <div class="text-center mb-4">
                                 <div class="avatar-circle mx-auto mb-3">
-                                    <i class="bi bi-person-fill"></i>
+                                    <i class="bi bi-shield-check"></i>
                                 </div>
-                                <h5 id="adminNameDisplay" class="mb-1 fw-bold">Loading...</h5>
-                                <span class="badge badge-tier badge-gold">Administrator</span>
+                                <h5 class="mb-1 fw-bold" id="adminNameDisplay">System Admin</h5>
+                                <span class="badge bg-success">Administrator</span>
                             </div>
 
                             <!-- Quick Stats -->
@@ -620,41 +522,37 @@
                                     <div class="stat-label">Total Users</div>
                                 </div>
                                 <div class="stat-item text-center">
-                                    <div class="stat-value text-warning" id="totalCollectors">0</div>
+                                    <div class="stat-value text-info" id="totalCollectors">0</div>
                                     <div class="stat-label">Collectors</div>
                                 </div>
                                 <div class="stat-item text-center">
-                                    <div class="stat-value text-success" id="activePickups">0</div>
-                                    <div class="stat-label">Active Pickups</div>
-                                </div>
-                                <div class="stat-item text-center">
-                                    <div class="stat-value text-info" id="totalRewards">0</div>
-                                    <div class="stat-label">Rewards</div>
+                                    <div class="stat-value text-warning" id="totalPickups">0</div>
+                                    <div class="stat-label">Pickups</div>
                                 </div>
                             </div>
 
                             <!-- Navigation Menu -->
                             <div class="nav-menu mt-4">
-                                <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')">
+                                <button class="nav-btn active" data-section="dashboard" onclick="app.sectionManager.showSection('dashboard')">
                                     <i class="bi bi-house me-2"></i>Dashboard
                                 </button>
-                                <button class="nav-btn" data-section="users" onclick="showSection('users')">
+                                <button class="nav-btn" data-section="users" onclick="app.sectionManager.showSection('users')">
                                     <i class="bi bi-people me-2"></i>User Management
                                 </button>
-                                <button class="nav-btn" data-section="collectors" onclick="showSection('collectors')">
-                                    <i class="bi bi-truck me-2"></i>Collectors
+                                <button class="nav-btn" data-section="collectors" onclick="app.sectionManager.showSection('collectors')">
+                                    <i class="bi bi-truck me-2"></i>Collector Management
                                 </button>
-                                <button class="nav-btn" data-section="pickups" onclick="showSection('pickups')">
-                                    <i class="bi bi-geo-alt me-2"></i>Pickup Management
+                                <button class="nav-btn" data-section="pickups" onclick="app.sectionManager.showSection('pickups')">
+                                    <i class="bi bi-clipboard-check me-2"></i>Pickup Management
                                 </button>
-                                <button class="nav-btn" data-section="rewards" onclick="showSection('rewards')">
+                                <button class="nav-btn" data-section="rewards" onclick="app.sectionManager.showSection('rewards')">
                                     <i class="bi bi-gift me-2"></i>Rewards System
                                 </button>
-                                <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')">
+                                <button class="nav-btn" data-section="analytics" onclick="app.sectionManager.showSection('analytics')">
                                     <i class="bi bi-graph-up me-2"></i>Analytics
                                 </button>
-                                <button class="nav-btn" data-section="settings" onclick="showSection('settings')">
-                                    <i class="bi bi-gear me-2"></i>System Settings
+                                <button class="nav-btn" data-section="reports" onclick="app.sectionManager.showSection('reports')">
+                                    <i class="bi bi-file-earmark-text me-2"></i>Reports
                                 </button>
                             </div>
                         </div>
@@ -664,20 +562,20 @@
                     <div class="card mt-4">
                         <div class="card-body">
                             <h6 class="card-title fw-bold mb-3">
-                                <i class="bi bi-server me-2 text-success"></i>System Status
+                                <i class="bi bi-heart-pulse me-2 text-success"></i>System Status
                             </h6>
                             <div class="system-stats">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span>API Status</span>
-                                    <span class="badge bg-success">Online</span>
+                                    <span>Server Uptime</span>
+                                    <strong class="text-success">99.9%</strong>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span>Database</span>
-                                    <span class="badge bg-success">Connected</span>
+                                    <span>Active Sessions</span>
+                                    <strong id="activeSessions" class="text-info">0</strong>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span>Uptime</span>
-                                    <strong class="text-success">99.9%</strong>
+                                    <span>System Load</span>
+                                    <strong id="systemLoad" class="text-warning">Low</strong>
                                 </div>
                             </div>
                         </div>
@@ -685,7 +583,7 @@
                 </div>
 
                 <!-- Main Content Area -->
-                <div class="col-lg-9 col-md-8">
+                <div class="col-lg-9 col-md-8 main-content">
                     <!-- Dashboard Section -->
                     <div id="dashboard-section" class="dashboard-section">
                         <!-- Welcome Banner -->
@@ -693,11 +591,11 @@
                             <div class="card-body">
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
-                                        <h4 class="text-white mb-2">Welcome back, <span id="welcomeName">Admin</span>! 👋</h4>
-                                        <p class="mb-0 text-white-75">Here's what's happening with your waste management system today.</p>
+                                        <h4 class="text-white mb-2">Welcome back, <span id="welcomeName">Administrator</span>! 👋</h4>
+                                        <p class="mb-0 text-white-75">Monitor system performance and manage operations from your dashboard.</p>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        <button class="btn btn-light rounded-pill px-4 fw-semibold" onclick="showSection('analytics')">
+                                        <button class="btn btn-light rounded-pill px-4 fw-semibold" onclick="app.sectionManager.showSection('analytics')">
                                             <i class="bi bi-graph-up me-2"></i>View Analytics
                                         </button>
                                     </div>
@@ -705,80 +603,56 @@
                             </div>
                         </div>
 
-                        <!-- Admin Stats Overview -->
-                        <div class="admin-stats-grid">
-                            <div class="admin-stat-card">
-                                <div class="admin-stat-value text-primary" id="totalRevenue">$0</div>
-                                <div class="admin-stat-label">Total Revenue</div>
-                            </div>
-                            <div class="admin-stat-card">
-                                <div class="admin-stat-value text-success" id="completedPickups">0</div>
-                                <div class="admin-stat-label">Completed Pickups</div>
-                            </div>
-                            <div class="admin-stat-card">
-                                <div class="admin-stat-value text-warning" id="pendingRequests">0</div>
-                                <div class="admin-stat-label">Pending Requests</div>
-                            </div>
-                            <div class="admin-stat-card">
-                                <div class="admin-stat-value text-info" id="newUsers">0</div>
-                                <div class="admin-stat-label">New Users (7d)</div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
+                        <!-- Key Metrics -->
                         <div class="row mb-4">
                             <div class="col-md-3 col-6 mb-3">
-                                <div class="quick-action-card text-center" onclick="showSection('users')">
-                                    <div class="action-icon bg-primary">
-                                        <i class="bi bi-person-plus"></i>
+                                <div class="analytics-card text-center">
+                                    <div class="analytics-value text-primary" id="metricUsers">0</div>
+                                    <div class="analytics-label">Total Users</div>
+                                    <div class="mt-2">
+                                        <small class="text-success" id="userGrowth">+0% this month</small>
                                     </div>
-                                    <h6 class="fw-semibold">Manage Users</h6>
-                                    <p class="text-muted small">User accounts & permissions</p>
                                 </div>
                             </div>
                             <div class="col-md-3 col-6 mb-3">
-                                <div class="quick-action-card text-center" onclick="showSection('rewards')">
-                                    <div class="action-icon bg-warning">
-                                        <i class="bi bi-gift"></i>
+                                <div class="analytics-card text-center">
+                                    <div class="analytics-value text-info" id="metricCollectors">0</div>
+                                    <div class="analytics-label">Active Collectors</div>
+                                    <div class="mt-2">
+                                        <small class="text-success" id="collectorGrowth">+0% this month</small>
                                     </div>
-                                    <h6 class="fw-semibold">Rewards System</h6>
-                                    <p class="text-muted small">Manage rewards & points</p>
                                 </div>
                             </div>
                             <div class="col-md-3 col-6 mb-3">
-                                <div class="quick-action-card text-center" onclick="showSection('analytics')">
-                                    <div class="action-icon bg-success">
-                                        <i class="bi bi-graph-up"></i>
+                                <div class="analytics-card text-center">
+                                    <div class="analytics-value text-warning" id="metricPickups">0</div>
+                                    <div class="analytics-label">Pickups This Month</div>
+                                    <div class="mt-2">
+                                        <small class="text-success" id="pickupGrowth">+0% this month</small>
                                     </div>
-                                    <h6 class="fw-semibold">View Analytics</h6>
-                                    <p class="text-muted small">System performance</p>
                                 </div>
                             </div>
                             <div class="col-md-3 col-6 mb-3">
-                                <div class="quick-action-card text-center" onclick="showSection('settings')">
-                                    <div class="action-icon bg-info">
-                                        <i class="bi bi-gear"></i>
+                                <div class="analytics-card text-center">
+                                    <div class="analytics-value text-success" id="metricEfficiency">0%</div>
+                                    <div class="analytics-label">Collection Efficiency</div>
+                                    <div class="mt-2">
+                                        <small class="text-success" id="efficiencyTrend">+0% improvement</small>
                                     </div>
-                                    <h6 class="fw-semibold">System Settings</h6>
-                                    <p class="text-muted small">Configure system</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Recent Activity & Charts -->
-                        <div class="row">
+                        <!-- Charts Row -->
+                        <div class="row mb-4">
                             <div class="col-md-8">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-activity me-2 text-primary"></i>Recent Activity</h5>
+                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-graph-up me-2 text-primary"></i>Pickup Trends</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="recentActivity">
-                                            <div class="empty-state">
-                                                <i class="bi bi-inbox"></i>
-                                                <h5>No Recent Activity</h5>
-                                                <p class="text-muted">System activity will appear here</p>
-                                            </div>
+                                        <div class="chart-container">
+                                            <canvas id="pickupTrendsChart"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -786,18 +660,55 @@
                             <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-bell me-2 text-warning"></i>System Alerts</h5>
+                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-pie-chart me-2 text-warning"></i>Waste Distribution</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="systemAlerts">
-                                            <div class="notification-item">
-                                                <div class="notification-icon bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                    <i class="bi bi-check-circle text-white"></i>
-                                                </div>
-                                                <div class="notification-content">
-                                                    <p class="mb-1 small">System is running smoothly</p>
-                                                    <small class="text-muted">Just now</small>
-                                                </div>
+                                        <div class="chart-container">
+                                            <canvas id="wasteDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity & Map -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Activity</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recentActivity">
+                                            <div class="empty-state">
+                                                <i class="bi bi-activity"></i>
+                                                <h5>No Recent Activity</h5>
+                                                <p class="text-muted">System activity will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 fw-semibold"><i class="bi bi-map me-2 text-success"></i>Pickup Heatmap</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="analyticsMap"></div>
+                                        <div class="heatmap-legend">
+                                            <h6 class="mb-2">Pickup Density</h6>
+                                            <div class="legend-item">
+                                                <div class="legend-color" style="background: #10B981;"></div>
+                                                <span>Low</span>
+                                            </div>
+                                            <div class="legend-item">
+                                                <div class="legend-color" style="background: #F59E0B;"></div>
+                                                <span>Medium</span>
+                                            </div>
+                                            <div class="legend-item">
+                                                <div class="legend-color" style="background: #EF4444;"></div>
+                                                <span>High</span>
                                             </div>
                                         </div>
                                     </div>
@@ -809,41 +720,66 @@
                     <!-- User Management Section -->
                     <div id="users-section" class="dashboard-section" style="display: none;">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0 fw-bold">
                                     <i class="bi bi-people me-2 text-primary"></i>User Management
                                 </h4>
+                                <div>
+                                    <button class="btn btn-primary btn-sm" onclick="app.userManager.exportUsers()">
+                                        <i class="bi bi-download me-1"></i>Export
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" onclick="showAddUserModal()">
-                                            <i class="bi bi-plus-circle me-2"></i>Add User
-                                        </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-download me-2"></i>Export
-                                        </button>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
-                                        <select class="form-select" style="width: auto;" id="userFilter">
-                                            <option value="all">All Users</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                            <option value="collector">Collectors</option>
-                                        </select>
+                                <!-- Filters -->
+                                <div class="filter-section">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Search Users</label>
+                                            <input type="text" class="form-control" id="userSearch" placeholder="Search by name or email...">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select" id="userStatusFilter">
+                                                <option value="">All Status</option>
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                                <option value="suspended">Suspended</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Tier</label>
+                                            <select class="form-select" id="userTierFilter">
+                                                <option value="">All Tiers</option>
+                                                <option value="bronze">Bronze</option>
+                                                <option value="silver">Silver</option>
+                                                <option value="gold">Gold</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Date Joined</label>
+                                            <select class="form-select" id="userDateFilter">
+                                                <option value="">All Time</option>
+                                                <option value="today">Today</option>
+                                                <option value="week">This Week</option>
+                                                <option value="month">This Month</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Users Table -->
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
                                                 <th>User</th>
                                                 <th>Email</th>
-                                                <th>Role</th>
+                                                <th>Tier</th>
+                                                <th>Pickups</th>
+                                                <th>Points</th>
                                                 <th>Status</th>
-                                                <th>Join Date</th>
+                                                <th>Joined</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -852,49 +788,75 @@
                                         </tbody>
                                     </table>
                                 </div>
+
+                                <!-- Pagination -->
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="text-muted" id="usersPaginationInfo">
+                                        Showing 0 of 0 users
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination mb-0" id="usersPagination">
+                                            <!-- Pagination will be populated by JavaScript -->
+                                        </ul>
+                                    </nav>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Collectors Section -->
+                    <!-- Collector Management Section -->
                     <div id="collectors-section" class="dashboard-section" style="display: none;">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0 fw-bold">
                                     <i class="bi bi-truck me-2 text-primary"></i>Collector Management
                                 </h4>
+                                <div>
+                                    <button class="btn btn-primary btn-sm" onclick="app.collectorManager.showAddCollectorModal()">
+                                        <i class="bi bi-plus-circle me-1"></i>Add Collector
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" onclick="showAddCollectorModal()">
-                                            <i class="bi bi-plus-circle me-2"></i>Add Collector
-                                        </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-download me-2"></i>Export Report
-                                        </button>
+                                <!-- Collector Stats -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-info" id="totalActiveCollectors">0</div>
+                                            <div class="analytics-label">Active Collectors</div>
+                                        </div>
                                     </div>
-                                    <div class="d-flex gap-2">
-                                        <input type="text" class="form-control" placeholder="Search collectors..." id="collectorSearch">
-                                        <select class="form-select" style="width: auto;" id="collectorFilter">
-                                            <option value="all">All Collectors</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                            <option value="available">Available</option>
-                                        </select>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-warning" id="avgCollectorRating">0.0</div>
+                                            <div class="analytics-label">Avg. Rating</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-success" id="totalCompletedPickups">0</div>
+                                            <div class="analytics-label">Completed Today</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-primary" id="onTimeRate">0%</div>
+                                            <div class="analytics-label">On-Time Rate</div>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Collectors Table -->
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
                                                 <th>Collector</th>
+                                                <th>Contact</th>
                                                 <th>Vehicle</th>
-                                                <th>Status</th>
+                                                <th>Active Pickups</th>
                                                 <th>Rating</th>
-                                                <th>Completed Jobs</th>
-                                                <th>Earnings</th>
+                                                <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -910,38 +872,70 @@
                     <!-- Pickup Management Section -->
                     <div id="pickups-section" class="dashboard-section" style="display: none;">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0 fw-bold">
-                                    <i class="bi bi-geo-alt me-2 text-primary"></i>Pickup Management
+                                    <i class="bi bi-clipboard-check me-2 text-primary"></i>Pickup Management
                                 </h4>
+                                <div>
+                                    <button class="btn btn-primary btn-sm" onclick="app.pickupManager.exportPickups()">
+                                        <i class="bi bi-download me-1"></i>Export
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="btn-group">
-                                        <button class="btn btn-outline-primary active" data-pickup-filter="all">All</button>
-                                        <button class="btn btn-outline-primary" data-pickup-filter="pending">Pending</button>
-                                        <button class="btn btn-outline-primary" data-pickup-filter="scheduled">Scheduled</button>
-                                        <button class="btn btn-outline-primary" data-pickup-filter="completed">Completed</button>
+                                <!-- Pickup Stats -->
+                                <div class="row mb-4">
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value" id="pickupPending">0</div>
+                                            <div class="analytics-label">Pending</div>
+                                        </div>
                                     </div>
-                                    <div class="d-flex gap-2">
-                                        <input type="text" class="form-control" placeholder="Search pickups..." id="pickupSearch">
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-download me-2"></i>Export
-                                        </button>
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-info" id="pickupAccepted">0</div>
+                                            <div class="analytics-label">Accepted</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-primary" id="pickupInProgress">0</div>
+                                            <div class="analytics-label">In Progress</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-success" id="pickupCompleted">0</div>
+                                            <div class="analytics-label">Completed</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-warning" id="pickupCancelled">0</div>
+                                            <div class="analytics-label">Cancelled</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-danger" id="pickupOverdue">0</div>
+                                            <div class="analytics-label">Overdue</div>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Pickups Table -->
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Customer</th>
-                                                <th>Location</th>
+                                                <th>User</th>
                                                 <th>Waste Type</th>
-                                                <th>Status</th>
-                                                <th>Requested</th>
+                                                <th>Location</th>
+                                                <th>Scheduled</th>
                                                 <th>Collector</th>
+                                                <th>Status</th>
+                                                <th>Points</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -957,152 +951,123 @@
                     <!-- Rewards System Section -->
                     <div id="rewards-section" class="dashboard-section" style="display: none;">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0 fw-bold">
-                                    <i class="bi bi-gift me-2 text-warning"></i>Rewards System Management
+                                    <i class="bi bi-gift me-2 text-warning"></i>Rewards System
                                 </h4>
+                                <div>
+                                    <button class="btn btn-primary btn-sm" onclick="app.rewardsManager.showAddRewardModal()">
+                                        <i class="bi bi-plus-circle me-1"></i>Add Reward
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <!-- Rewards Header with Stats -->
-                                <div class="rewards-header">
-                                    <h3 class="mb-3">🎁 Rewards System Overview</h3>
-                                    <p class="mb-4">Manage rewards, points system, and user redemptions</p>
-                                    <div class="rewards-stats">
-                                        <div class="reward-stat">
-                                            <div class="reward-stat-value text-white" id="totalRewardsCount">0</div>
-                                            <div class="reward-stat-label">Total Rewards</div>
+                                <!-- Rewards Stats -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-warning" id="totalPointsIssued">0</div>
+                                            <div class="analytics-label">Total Points Issued</div>
                                         </div>
-                                        <div class="reward-stat">
-                                            <div class="reward-stat-value text-white" id="activeRewards">0</div>
-                                            <div class="reward-stat-label">Active Rewards</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-success" id="totalRewardsRedeemed">0</div>
+                                            <div class="analytics-label">Rewards Redeemed</div>
                                         </div>
-                                        <div class="reward-stat">
-                                            <div class="reward-stat-value text-white" id="totalRedemptions">0</div>
-                                            <div class="reward-stat-label">Total Redemptions</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-info" id="activeRewards">0</div>
+                                            <div class="analytics-label">Active Rewards</div>
                                         </div>
-                                        <div class="reward-stat">
-                                            <div class="reward-stat-value text-white" id="pointsIssued">0</div>
-                                            <div class="reward-stat-label">Points Issued</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="analytics-card text-center">
+                                            <div class="analytics-value text-primary" id="redemptionRate">0%</div>
+                                            <div class="analytics-label">Redemption Rate</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Rewards Management Tabs -->
-                                <ul class="nav nav-tabs mb-4" id="rewardsTabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="rewards-tab" data-bs-toggle="tab" data-bs-target="#rewards-list" type="button" role="tab">
-                                            <i class="bi bi-gift me-2"></i>Manage Rewards
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="points-tab" data-bs-toggle="tab" data-bs-target="#points-system" type="button" role="tab">
-                                            <i class="bi bi-star me-2"></i>Points System
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="redemptions-tab" data-bs-toggle="tab" data-bs-target="#redemptions" type="button" role="tab">
-                                            <i class="bi bi-check-circle me-2"></i>Redemptions
-                                        </button>
-                                    </li>
-                                </ul>
-
-                                <div class="tab-content" id="rewardsTabContent">
-                                    <!-- Manage Rewards Tab -->
-                                    <div class="tab-pane fade show active" id="rewards-list" role="tabpanel">
-                                        <div class="d-flex justify-content-between align-items-center mb-4">
-                                            <button class="btn btn-primary" onclick="showAddRewardModal()">
-                                                <i class="bi bi-plus-circle me-2"></i>Add New Reward
-                                            </button>
-                                            <div class="d-flex gap-2">
-                                                <input type="text" class="form-control" placeholder="Search rewards..." id="rewardSearch">
-                                                <select class="form-select" style="width: auto;" id="rewardFilter">
-                                                    <option value="all">All Rewards</option>
-                                                    <option value="active">Active</option>
-                                                    <option value="inactive">Inactive</option>
-                                                    <option value="low-stock">Low Stock</option>
-                                                </select>
+                                <!-- Rewards Configuration -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Points Configuration</h6>
                                             </div>
-                                        </div>
-
-                                        <div class="row" id="rewardsList">
-                                            <!-- Rewards will be populated by JavaScript -->
-                                        </div>
-                                    </div>
-
-                                    <!-- Points System Tab -->
-                                    <div class="tab-pane fade" id="points-system" role="tabpanel">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">Points Configuration</h5>
+                                            <div class="card-body">
+                                                <form id="pointsConfigForm">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Waste Type</th>
+                                                                    <th>Small</th>
+                                                                    <th>Medium</th>
+                                                                    <th>Large</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="pointsConfigTable">
+                                                                <!-- Points configuration will be populated by JavaScript -->
+                                                            </tbody>
+                                                        </table>
                                                     </div>
-                                                    <div class="card-body">
-                                                        <form id="pointsConfigForm">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Points per Kilogram</label>
-                                                                <input type="number" class="form-control" id="pointsPerKg" value="10">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Bonus Points (First Pickup)</label>
-                                                                <input type="number" class="form-control" id="firstPickupBonus" value="50">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Referral Bonus Points</label>
-                                                                <input type="number" class="form-control" id="referralBonus" value="100">
-                                                            </div>
-                                                            <button type="submit" class="btn btn-primary">Save Configuration</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">Tier System</h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Bronze Tier (Points)</label>
-                                                            <input type="number" class="form-control" id="bronzeTier" value="0" disabled>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Silver Tier (Points)</label>
-                                                            <input type="number" class="form-control" id="silverTier" value="500">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Gold Tier (Points)</label>
-                                                            <input type="number" class="form-control" id="goldTier" value="1500">
-                                                        </div>
-                                                        <div class="alert alert-info">
-                                                            <i class="bi bi-info-circle me-2"></i>
-                                                            Users automatically progress through tiers based on their total points.
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                    <button type="submit" class="btn btn-primary mt-3">
+                                                        <i class="bi bi-check-circle me-1"></i>Update Points
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Redemptions Tab -->
-                                    <div class="tab-pane fade" id="redemptions" role="tabpanel">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>User</th>
-                                                        <th>Reward</th>
-                                                        <th>Points Used</th>
-                                                        <th>Date</th>
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="redemptionsTable">
-                                                    <!-- Redemptions will be populated by JavaScript -->
-                                                </tbody>
-                                            </table>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Tier Configuration</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="tierConfigForm">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Bronze Tier</label>
+                                                        <input type="number" class="form-control" id="bronzeTier" value="0" readonly>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Silver Tier</label>
+                                                        <input type="number" class="form-control" id="silverTier" value="500">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Gold Tier</label>
+                                                        <input type="number" class="form-control" id="goldTier" value="1500">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="bi bi-check-circle me-1"></i>Update Tiers
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- Rewards List -->
+                                <div class="mt-4">
+                                    <h5 class="mb-3">Available Rewards</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Reward</th>
+                                                    <th>Category</th>
+                                                    <th>Points</th>
+                                                    <th>Redeemed</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="rewardsTable">
+                                                <!-- Rewards will be populated by JavaScript -->
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -1114,62 +1079,78 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="mb-0 fw-bold">
-                                    <i class="bi bi-graph-up me-2 text-success"></i>System Analytics
+                                    <i class="bi bi-graph-up me-2 text-primary"></i>Advanced Analytics
                                 </h4>
                             </div>
                             <div class="card-body">
+                                <!-- Date Range Filter -->
+                                <div class="filter-section">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Start Date</label>
+                                            <input type="date" class="form-control" id="analyticsStartDate">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">End Date</label>
+                                            <input type="date" class="form-control" id="analyticsEndDate">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Metric</label>
+                                            <select class="form-select" id="analyticsMetric">
+                                                <option value="pickups">Pickup Volume</option>
+                                                <option value="users">User Growth</option>
+                                                <option value="efficiency">Collection Efficiency</option>
+                                                <option value="rewards">Reward Redemptions</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button class="btn btn-primary w-100" onclick="app.analyticsManager.updateCharts()">
+                                                <i class="bi bi-filter me-1"></i>Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Charts -->
                                 <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <select class="form-select" id="analyticsPeriod">
-                                            <option value="7d">Last 7 Days</option>
-                                            <option value="30d" selected>Last 30 Days</option>
-                                            <option value="90d">Last 90 Days</option>
-                                            <option value="1y">Last Year</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">User Growth Trend</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="chart-container">
+                                                    <canvas id="userGrowthChart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-9 text-end">
-                                        <div class="btn-group">
-                                            <button class="btn btn-outline-primary active" data-metric="pickups">Pickups</button>
-                                            <button class="btn btn-outline-primary" data-metric="revenue">Revenue</button>
-                                            <button class="btn btn-outline-primary" data-metric="users">Users</button>
-                                            <button class="btn btn-outline-primary" data-metric="rewards">Rewards</button>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Collection Efficiency</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="chart-container">
+                                                    <canvas id="efficiencyChart"></canvas>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Performance Metrics -->
                                 <div class="row">
-                                    <div class="col-md-8">
-                                        <div class="chart-container">
-                                            <h5 class="analytics-title">Performance Overview</h5>
-                                            <div id="analyticsChart" style="height: 300px; display: flex; align-items: center; justify-content: center; background: var(--dark-lighter); border-radius: 8px;">
-                                                <p class="text-muted">Analytics chart will be displayed here</p>
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Performance Overview</h6>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="chart-container">
-                                            <h5 class="analytics-title">Waste Distribution</h5>
-                                            <div id="wasteDistributionChart" style="height: 300px; display: flex; align-items: center; justify-content: center; background: var(--dark-lighter); border-radius: 8px;">
-                                                <p class="text-muted">Distribution chart will be displayed here</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mt-4">
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <h5 class="analytics-title">User Growth</h5>
-                                            <div id="userGrowthChart" style="height: 250px; display: flex; align-items: center; justify-content: center; background: var(--dark-lighter); border-radius: 8px;">
-                                                <p class="text-muted">User growth chart will be displayed here</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <h5 class="analytics-title">Reward Redemptions</h5>
-                                            <div id="redemptionsChart" style="height: 250px; display: flex; align-items: center; justify-content: center; background: var(--dark-lighter); border-radius: 8px;">
-                                                <p class="text-muted">Redemptions chart will be displayed here</p>
+                                            <div class="card-body">
+                                                <div class="chart-container">
+                                                    <canvas id="performanceChart"></canvas>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1178,78 +1159,157 @@
                         </div>
                     </div>
 
-                    <!-- System Settings Section -->
-                    <div id="settings-section" class="dashboard-section" style="display: none;">
+                    <!-- Reports Section -->
+                    <div id="reports-section" class="dashboard-section" style="display: none;">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="mb-0 fw-bold">
-                                    <i class="bi bi-gear me-2 text-info"></i>System Settings
+                                    <i class="bi bi-file-earmark-text me-2 text-primary"></i>Reports & Exports
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <!-- Report Generation -->
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-people fs-1 text-primary mb-3"></i>
+                                                <h5>User Report</h5>
+                                                <p class="text-muted">Generate comprehensive user activity report</p>
+                                                <button class="btn btn-primary" onclick="app.reportsManager.generateUserReport()">
+                                                    <i class="bi bi-download me-1"></i>Generate Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-clipboard-check fs-1 text-info mb-3"></i>
+                                                <h5>Pickup Report</h5>
+                                                <p class="text-muted">Detailed pickup performance analysis</p>
+                                                <button class="btn btn-primary" onclick="app.reportsManager.generatePickupReport()">
+                                                    <i class="bi bi-download me-1"></i>Generate Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-gift fs-1 text-warning mb-3"></i>
+                                                <h5>Rewards Report</h5>
+                                                <p class="text-muted">Reward system performance and redemption</p>
+                                                <button class="btn btn-primary" onclick="app.reportsManager.generateRewardsReport()">
+                                                    <i class="bi bi-download me-1"></i>Generate Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Reports -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Recently Generated Reports</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Report Name</th>
+                                                        <th>Generated</th>
+                                                        <th>Type</th>
+                                                        <th>Size</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="reportsTable">
+                                                    <!-- Reports will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Settings Section -->
+                    <div id="system-settings-section" class="dashboard-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="mb-0 fw-bold">
+                                    <i class="bi bi-gear me-2 text-primary"></i>System Settings
                                 </h4>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="card mb-4">
+                                        <div class="card">
                                             <div class="card-header">
-                                                <h5 class="mb-0">General Settings</h5>
+                                                <h6 class="mb-0">General Settings</h6>
                                             </div>
                                             <div class="card-body">
                                                 <form id="generalSettingsForm">
                                                     <div class="mb-3">
                                                         <label class="form-label">System Name</label>
-                                                        <input type="text" class="form-control" id="systemName" value="SmartWaste">
+                                                        <input type="text" class="form-control" value="SmartWaste Management System">
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">Default Currency</label>
-                                                        <select class="form-select" id="defaultCurrency">
-                                                            <option value="USD">USD ($)</option>
-                                                            <option value="EUR">EUR (€)</option>
-                                                            <option value="GBP">GBP (£)</option>
-                                                        </select>
+                                                        <label class="form-label">Default Points Multiplier</label>
+                                                        <input type="number" class="form-control" value="1.0" step="0.1">
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">Time Zone</label>
-                                                        <select class="form-select" id="timeZone">
-                                                            <option value="UTC">UTC</option>
-                                                            <option value="EST">Eastern Time</option>
-                                                            <option value="PST">Pacific Time</option>
+                                                        <label class="form-label">Auto-assign Collectors</label>
+                                                        <select class="form-select">
+                                                            <option value="true">Enabled</option>
+                                                            <option value="false">Disabled</option>
                                                         </select>
                                                     </div>
-                                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="bi bi-check-circle me-1"></i>Save Settings
+                                                    </button>
                                                 </form>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="card mb-4">
+                                        <div class="card">
                                             <div class="card-header">
-                                                <h5 class="mb-0">Notification Settings</h5>
+                                                <h6 class="mb-0">Notification Settings</h6>
                                             </div>
                                             <div class="card-body">
-                                                <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
-                                                    <label class="form-check-label" for="emailNotifications">
-                                                        Email Notifications
-                                                    </label>
-                                                </div>
-                                                <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="smsNotifications">
-                                                    <label class="form-check-label" for="smsNotifications">
-                                                        SMS Notifications
-                                                    </label>
-                                                </div>
-                                                <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="systemAlertsSetting" checked>
-                                                    <label class="form-check-label" for="systemAlertsSetting">
-                                                        System Alerts
-                                                    </label>
-                                                </div>
-                                                <div class="form-check form-switch mb-3">
-                                                    <input class="form-check-input" type="checkbox" id="maintenanceMode">
-                                                    <label class="form-check-label" for="maintenanceMode">
-                                                        Maintenance Mode
-                                                    </label>
-                                                </div>
+                                                <form id="notificationSettingsForm">
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                                        <label class="form-check-label" for="emailNotifications">
+                                                            Email Notifications
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="pickupAlerts" checked>
+                                                        <label class="form-check-label" for="pickupAlerts">
+                                                            Pickup Alerts
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="systemAlerts" checked>
+                                                        <label class="form-check-label" for="systemAlerts">
+                                                            System Alerts
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="performanceReports">
+                                                        <label class="form-check-label" for="performanceReports">
+                                                            Performance Reports
+                                                        </label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="bi bi-check-circle me-1"></i>Save Settings
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -1265,9 +1325,54 @@
     <!-- Toast Container for Notifications -->
     <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
+    <!-- Add Collector Modal -->
+    <div class="modal fade" id="addCollectorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark-light">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Add New Collector</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCollectorForm">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone *</label>
+                            <input type="tel" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vehicle Type</label>
+                            <select class="form-select">
+                                <option value="truck">Truck</option>
+                                <option value="van">Van</option>
+                                <option value="car">Car</option>
+                                <option value="bike">Bike</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">License Plate</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="app.collectorManager.addCollector()">Add Collector</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Reward Modal -->
     <div class="modal fade" id="addRewardModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark-light">
                 <div class="modal-header border-0">
                     <h5 class="modal-title">Add New Reward</h5>
@@ -1275,57 +1380,98 @@
                 </div>
                 <div class="modal-body">
                     <form id="addRewardForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Reward Name</label>
-                                    <input type="text" class="form-control" id="rewardName" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" id="rewardDescription" rows="3" required></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Points Required</label>
-                                    <input type="number" class="form-control" id="rewardPoints" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Tier</label>
-                                    <select class="form-select" id="rewardTier" required>
-                                        <option value="bronze">Bronze</option>
-                                        <option value="silver">Silver</option>
-                                        <option value="gold">Gold</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Stock Quantity</label>
-                                    <input type="number" class="form-control" id="rewardStock" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Image URL</label>
-                                    <input type="url" class="form-control" id="rewardImage" placeholder="https://example.com/image.jpg">
-                                </div>
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="rewardActive" checked>
-                                    <label class="form-check-label" for="rewardActive">
-                                        Active Reward
-                                    </label>
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reward Name *</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Points Required *</label>
+                            <input type="number" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select">
+                                <option value="eco">Eco Products</option>
+                                <option value="digital">Digital</option>
+                                <option value="membership">Membership</option>
+                                <option value="voucher">Voucher</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Stock Quantity</label>
+                            <input type="number" class="form-control" value="100">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="addNewReward()">Add Reward</button>
+                    <button type="button" class="btn btn-primary" onclick="app.rewardsManager.addReward()">Add Reward</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Add logout functionality directly in HTML -->
+    <script>
+    // Simple logout function
+    function logout() {
+        if (confirm('Are you sure you want to log out?')) {
+            // Clear storage
+            localStorage.clear();
+            sessionStorage.clear();
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+        return false;
+    }
+
+    // Make it available globally
+    window.logout = logout;
+
+    // Add event listener for logout link
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+    });
+
+    // Global section navigation fallback
+    window.showSection = function(sectionName) {
+        // Hide all sections
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show selected section
+        const targetSection = document.getElementById(`${sectionName}-section`);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+        
+        // Update active nav
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-section') === sectionName) {
+                btn.classList.add('active');
+            }
+        });
+    };
+    </script>
+    
     <script src="dashboard-admin.js"></script>
+    <script src="/js/api-service.js"></script>
+    <script src="/js/realtime.js"></script>
 </body>
 </html>

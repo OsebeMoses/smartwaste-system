@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWaste - Integration Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #0F172A; color: #F1F5F9; }
+        .test-section { margin-bottom: 2rem; }
+        .test-result { padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
+        .test-pass { background-color: #10B981; color: white; }
+        .test-fail { background-color: #EF4444; color: white; }
+        .test-pending { background-color: #F59E0B; color: white; }
+        .test-info { background-color: #3B82F6; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="text-center mb-5">SmartWaste Integration Test</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="test-section">
+                    <h3>API Service Tests</h3>
+                    <div id="apiTests"></div>
+                </div>
+                
+                <div class="test-section">
+                    <h3>Notification Service Tests</h3>
+                    <div id="notificationTests"></div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="test-section">
+                    <h3>Map Integration Tests</h3>
+                    <div id="mapTests"></div>
+                </div>
+                
+                <div class="test-section">
+                    <h3>Real-time Service Tests</h3>
+                    <div id="realtimeTests"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <button class="btn btn-primary btn-lg" onclick="runAllTests()">Run All Tests</button>
+            <button class="btn btn-secondary btn-lg ms-3" onclick="clearResults()">Clear Results</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/api-service.js"></script>
+    <script src="js/notification-service.js"></script>
+    <script src="js/realtime.js"></script>
+    <script src="js/map.js"></script>
+
+    <script>
+        class IntegrationTester {
+            constructor() {
+                this.results = {
+                    api: [],
+                    notification: [],
+                    map: [],
+                    realtime: []
+                };
+            }
+
+            addResult(category, test, status, message) {
+                this.results[category].push({ test, status, message });
+                this.updateDisplay(category);
+            }
+
+            updateDisplay(category) {
+                const container = document.getElementById(`${category}Tests`);
+                container.innerHTML = this.results[category].map(result => `
+                    <div class="test-result test-${result.status}">
+                        <strong>${result.test}:</strong> ${result.message}
+                    </div>
+                `).join('');
+            }
+
+            clearResults() {
+                Object.keys(this.results).forEach(category => {
+                    this.results[category] = [];
+                    this.updateDisplay(category);
+                });
+            }
+
+            async testAPIService() {
+                console.log('Testing API Service...');
+                
+                // Test 1: API Service exists
+                if (window.apiService) {
+                    this.addResult('api', 'API Service Initialization', 'pass', 'API Service loaded successfully');
+                } else {
+                    this.addResult('api', 'API Service Initialization', 'fail', 'API Service not found');
+                    return;
+                }
+
+                // Test 2: API Service methods
+                const requiredMethods = ['getCurrentUser', 'createPickup', 'getRewards', 'redeemReward'];
+                const missingMethods = requiredMethods.filter(method => typeof window.apiService[method] !== 'function');
+                
+                if (missingMethods.length === 0) {
+                    this.addResult('api', 'API Methods', 'pass', 'All required methods available');
+                } else {
+                    this.addResult('api', 'API Methods', 'fail', `Missing methods: ${missingMethods.join(', ')}`);
+                }
+
+                // Test 3: API Service configuration
+                if (window.apiService.baseURL) {
+                    this.addResult('api', 'API Configuration', 'pass', `Base URL: ${window.apiService.baseURL}`);
+                } else {
+                    this.addResult('api', 'API Configuration', 'fail', 'Base URL not configured');
+                }
+
+                // Test 4: Token handling
+                if (window.apiService.token !== null) {
+                    this.addResult('api', 'Token Handling', 'pass', 'Token handling implemented');
+                } else {
+                    this.addResult('api', 'Token Handling', 'info', 'No token present (expected for test)');
+                }
+            }
+
+            async testNotificationService() {
+                console.log('Testing Notification Service...');
+                
+                // Test 1: Notification Service exists
+                if (window.notificationService) {
+                    this.addResult('notification', 'Notification Service Initialization', 'pass', 'Notification Service loaded successfully');
+                } else {
+                    this.addResult('notification', 'Notification Service Initialization', 'fail', 'Notification Service not found');
+                    return;
+                }
+
+                // Test 2: Notification methods
+                const requiredMethods = ['sendEmailNotification', 'sendSMSNotification', 'sendPickupStatusNotification'];
+                const missingMethods = requiredMethods.filter(method => typeof window.notificationService[method] !== 'function');
+                
+                if (missingMethods.length === 0) {
+                    this.addResult('notification', 'Notification Methods', 'pass', 'All required methods available');
+                } else {
+                    this.addResult('notification', 'Notification Methods', 'fail', `Missing methods: ${missingMethods.join(', ')}`);
+                }
+
+                // Test 3: Test email notification
+                try {
+                    await window.notificationService.sendEmailNotification(
+                        'test@example.com',
+                        'Test Email',
+                        'This is a test email from SmartWaste integration test.'
+                    );
+                    this.addResult('notification', 'Email Notification', 'pass', 'Email notification sent successfully');
+                } catch (error) {
+                    this.addResult('notification', 'Email Notification', 'fail', `Error: ${error.message}`);
+                }
+
+                // Test 4: Test SMS notification
+                try {
+                    await window.notificationService.sendSMSNotification(
+                        '+254712345678',
+                        'Test SMS from SmartWaste'
+                    );
+                    this.addResult('notification', 'SMS Notification', 'pass', 'SMS notification sent successfully');
+                } catch (error) {
+                    this.addResult('notification', 'SMS Notification', 'fail', `Error: ${error.message}`);
+                }
+            }
+
+            async testMapIntegration() {
+                console.log('Testing Map Integration...');
+                
+                // Test 1: Leaflet library
+                if (typeof L !== 'undefined') {
+                    this.addResult('map', 'Leaflet Library', 'pass', 'Leaflet library loaded successfully');
+                } else {
+                    this.addResult('map', 'Leaflet Library', 'fail', 'Leaflet library not found');
+                    return;
+                }
+
+                // Test 2: Map functions
+                if (typeof initMap === 'function') {
+                    this.addResult('map', 'Map Functions', 'pass', 'Map initialization function available');
+                } else {
+                    this.addResult('map', 'Map Functions', 'fail', 'Map initialization function not found');
+                }
+
+                // Test 3: Geolocation support
+                if (navigator.geolocation) {
+                    this.addResult('map', 'Geolocation Support', 'pass', 'Geolocation API available');
+                } else {
+                    this.addResult('map', 'Geolocation Support', 'fail', 'Geolocation API not available');
+                }
+
+                // Test 4: Map container creation
+                const mapContainer = document.createElement('div');
+                mapContainer.id = 'testMap';
+                mapContainer.style.height = '200px';
+                document.body.appendChild(mapContainer);
+
+                try {
+                    const testMap = L.map('testMap').setView([-1.2921, 36.8219], 10);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(testMap);
+                    this.addResult('map', 'Map Creation', 'pass', 'Map created successfully');
+                    testMap.remove();
+                } catch (error) {
+                    this.addResult('map', 'Map Creation', 'fail', `Error: ${error.message}`);
+                }
+
+                document.body.removeChild(mapContainer);
+            }
+
+            async testRealtimeService() {
+                console.log('Testing Real-time Service...');
+                
+                // Test 1: Real-time Manager exists
+                if (window.realtimeManager) {
+                    this.addResult('realtime', 'Real-time Manager', 'pass', 'Real-time Manager loaded successfully');
+                } else {
+                    this.addResult('realtime', 'Real-time Manager', 'fail', 'Real-time Manager not found');
+                    return;
+                }
+
+                // Test 2: WebSocket support
+                if (typeof WebSocket !== 'undefined') {
+                    this.addResult('realtime', 'WebSocket Support', 'pass', 'WebSocket API available');
+                } else {
+                    this.addResult('realtime', 'WebSocket Support', 'fail', 'WebSocket API not available');
+                }
+
+                // Test 3: Real-time methods
+                const requiredMethods = ['connect', 'send', 'handleMessage'];
+                const missingMethods = requiredMethods.filter(method => typeof window.realtimeManager[method] !== 'function');
+                
+                if (missingMethods.length === 0) {
+                    this.addResult('realtime', 'Real-time Methods', 'pass', 'All required methods available');
+                } else {
+                    this.addResult('realtime', 'Real-time Methods', 'fail', `Missing methods: ${missingMethods.join(', ')}`);
+                }
+
+                // Test 4: Connection attempt (will fail in test environment)
+                try {
+                    // This will fail in test environment, but we can check if the method exists
+                    this.addResult('realtime', 'Connection Test', 'info', 'Connection test skipped (no server)');
+                } catch (error) {
+                    this.addResult('realtime', 'Connection Test', 'info', 'Connection test skipped (no server)');
+                }
+            }
+
+            async runAllTests() {
+                console.log('Running all integration tests...');
+                this.clearResults();
+                
+                await this.testAPIService();
+                await this.testNotificationService();
+                await this.testMapIntegration();
+                await this.testRealtimeService();
+                
+                console.log('All tests completed');
+            }
+        }
+
+        // Initialize tester
+        const tester = new IntegrationTester();
+
+        // Global functions
+        function runAllTests() {
+            tester.runAllTests();
+        }
+
+        function clearResults() {
+            tester.clearResults();
+        }
+
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                runAllTests();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
