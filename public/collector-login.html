@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartWaste - Administrator Command Portal</title>
+    <title>SmartWaste - Driver & Collector Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,13 +11,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary-purple: #8b5cf6;
-            --dark-purple: #6d28d9;
-            --accent-cyan: #38bdf8;
-            --bg-dark: #090d16;
-            --card-dark: #0f172a;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+            --primary-blue: #3b82f6;
+            --dark-blue: #1d4ed8;
+            --accent-cyan: #06b6d4;
+            --text-dark: #0f172a;
+            --bg-page: #f8fafc;
         }
 
         * {
@@ -29,8 +27,8 @@
             padding: 0;
             min-height: 100vh;
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            background-color: var(--bg-page);
+            color: var(--text-dark);
             overflow-x: hidden;
         }
 
@@ -44,7 +42,7 @@
         .hero-split-panel {
             flex: 1 1 53%;
             position: relative;
-            background-image: url('images/admin-iot-dispatch-map.jpg');
+            background-image: url('images/collector-truck-crane.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -58,7 +56,7 @@
         .hero-spotlight {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle 550px at var(--mouse-x, 50%) var(--mouse-y, 35%), rgba(139, 92, 246, 0.25), transparent 75%);
+            background: radial-gradient(circle 550px at var(--mouse-x, 50%) var(--mouse-y, 35%), rgba(6, 182, 212, 0.25), transparent 75%);
             pointer-events: none;
             z-index: 2;
             transition: opacity 0.3s ease;
@@ -68,9 +66,9 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(145deg, 
-                rgba(6, 9, 20, 0.88) 0%, 
-                rgba(18, 12, 38, 0.72) 45%, 
-                rgba(3, 4, 10, 0.95) 100%
+                rgba(3, 10, 24, 0.85) 0%, 
+                rgba(8, 28, 55, 0.70) 45%, 
+                rgba(2, 6, 18, 0.94) 100%
             );
             z-index: 1;
             backdrop-filter: saturate(120%);
@@ -99,21 +97,21 @@
             align-items: center;
             gap: 10px;
             padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(14px);
-            border: 1px solid rgba(167, 139, 250, 0.4);
+            border: 1px solid rgba(96, 165, 250, 0.4);
             border-radius: 30px;
             font-size: 0.84rem;
             font-weight: 600;
-            color: #ede9fe;
+            color: #dbeafe;
         }
 
         .pulse-beacon {
             width: 9px;
             height: 9px;
-            background-color: #a78bfa;
+            background-color: var(--accent-cyan);
             border-radius: 50%;
-            box-shadow: 0 0 10px #a78bfa;
+            box-shadow: 0 0 10px var(--accent-cyan);
             animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
         }
 
@@ -132,7 +130,7 @@
             border-radius: 20px;
             font-size: 0.78rem;
             font-weight: 600;
-            color: #c4b5fd;
+            color: #93c5fd;
             letter-spacing: 0.04em;
         }
 
@@ -147,9 +145,9 @@
             font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #c084fc;
-            background: rgba(192, 132, 252, 0.15);
-            border: 1px solid rgba(192, 132, 252, 0.3);
+            color: #67e8f9;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
             padding: 5px 14px;
             border-radius: 30px;
             margin-bottom: 1.25rem;
@@ -165,7 +163,7 @@
         }
 
         .hero-headline span {
-            background: linear-gradient(135deg, #c084fc 0%, #38bdf8 100%);
+            background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -201,7 +199,7 @@
 
         .glass-chip:hover {
             background: rgba(30, 41, 59, 0.75);
-            border-color: rgba(192, 132, 252, 0.4);
+            border-color: rgba(96, 165, 250, 0.4);
             transform: translateY(-2px);
         }
 
@@ -209,12 +207,12 @@
             width: 38px;
             height: 38px;
             border-radius: 10px;
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #c084fc;
+            color: #60a5fa;
             font-size: 1.15rem;
             flex-shrink: 0;
         }
@@ -236,7 +234,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(6, 9, 20, 0.75);
+            background: rgba(3, 10, 24, 0.7);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 18px;
@@ -252,7 +250,7 @@
         .telemetry-val {
             font-size: 1.25rem;
             font-weight: 800;
-            color: #c084fc;
+            color: #38bdf8;
             letter-spacing: -0.02em;
         }
 
@@ -277,7 +275,7 @@
             align-items: center;
             justify-content: center;
             padding: 3rem 2.5rem;
-            background: #0b1120;
+            background: #ffffff;
             min-height: 100vh;
         }
 
@@ -287,17 +285,15 @@
         }
 
         .card {
-            background: #111827;
-            border: 1px solid #1f2937;
+            border: 1px solid #e2e8f0;
             border-radius: 20px;
-            box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.08);
             overflow: hidden;
-            color: #f1f5f9;
         }
 
         .card-header {
-            background: #111827;
-            border-bottom: 1px solid #1f2937;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
             padding: 2rem 2rem 1.25rem 2rem;
             text-align: center;
         }
@@ -305,7 +301,7 @@
         .logo-icon {
             width: 56px;
             height: 56px;
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -313,18 +309,18 @@
             margin: 0 auto 1rem;
             color: white;
             font-size: 1.8rem;
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
         }
 
         .logo-text h3 {
             font-size: 1.5rem;
             font-weight: 800;
             margin-bottom: 0.25rem;
-            color: #ffffff;
+            color: #0f172a;
         }
 
         .logo-text p {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 0.9rem;
             margin-bottom: 0;
         }
@@ -336,14 +332,12 @@
         .form-label {
             font-size: 0.88rem;
             font-weight: 600;
-            color: #cbd5e1;
+            color: #334155;
             margin-bottom: 0.4rem;
         }
 
         .form-control {
-            background-color: #0b1120;
-            color: #f8fafc;
-            border: 1.5px solid #334155;
+            border: 1.5px solid #cbd5e1;
             border-radius: 10px;
             padding: 0.75rem 1rem;
             font-size: 0.95rem;
@@ -351,10 +345,8 @@
         }
 
         .form-control:focus {
-            background-color: #0b1120;
-            color: #ffffff;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
 
         .password-input-group {
@@ -368,27 +360,25 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #94a3b8;
+            color: #64748b;
             cursor: pointer;
             padding: 4px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             border: none;
             border-radius: 12px;
             padding: 0.85rem;
             font-weight: 700;
             font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
             transition: all 0.25s;
-            color: #ffffff;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
-            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
 
         @media (max-width: 991.98px) {
@@ -413,58 +403,58 @@
             <div class="hero-top-badge">
                 <div class="iot-beacon">
                     <span class="pulse-beacon"></span>
-                    <span>Municipal Command Grid Active</span>
+                    <span>Fleet Dispatch Grid Active</span>
                 </div>
                 <div class="network-badge">
-                    <i class="bi bi-cpu me-1"></i>3D IoT Blueprint v3.4
+                    <i class="bi bi-geo-alt-fill me-1"></i>GPS & 5G Fleet Mesh
                 </div>
             </div>
 
             <!-- Center Content Over Photo -->
             <div class="hero-center-content">
-                <span class="hero-glamour-tag"><i class="bi bi-shield-check me-1"></i>CENTRALIZED INFRASTRUCTURE COMMAND</span>
-                <h1 class="hero-headline">City-Wide IoT <span>Bin Dispatch Network</span></h1>
-                <p class="hero-description">Spatial telemetry oversight across Nairobi smart bins, dynamic recovery centers, vehicle fleet routing, and environmental audit metrics.</p>
+                <span class="hero-glamour-tag"><i class="bi bi-truck me-1"></i>MUNICIPAL LOGISTICS FLEET</span>
+                <h1 class="hero-headline">Robotic Crane <span>Fleet Operations</span></h1>
+                <p class="hero-description">Dynamic Nairobi collection routes, hydraulic crane lift telemetry, automated bin weight capture, and digital shift logs.</p>
 
                 <!-- Glassmorphic Feature Cards Grid -->
                 <div class="glass-chips-grid">
                     <div class="glass-chip">
                         <div class="glass-chip-icon">
-                            <i class="bi bi-map"></i>
+                            <i class="bi bi-compass"></i>
                         </div>
                         <div class="glass-chip-text">
-                            <h6>3D Blueprint Mesh</h6>
-                            <p>Live Nairobi bin fill mapping (<20%, 50%, 92%)</p>
+                            <h6>Route Optimization</h6>
+                            <p>AI-calculated shortest collection paths</p>
                         </div>
                     </div>
 
                     <div class="glass-chip">
                         <div class="glass-chip-icon">
-                            <i class="bi bi-bezier2"></i>
+                            <i class="bi bi-gear-wide-connected"></i>
                         </div>
                         <div class="glass-chip-text">
-                            <h6>Dynamic Dispatch</h6>
-                            <p>Automated recovery center logistics routes</p>
+                            <h6>Robotic Crane Arm</h6>
+                            <p>Hydraulic lift & payload telemetry</p>
                         </div>
                     </div>
 
                     <div class="glass-chip">
                         <div class="glass-chip-icon">
-                            <i class="bi bi-shield-lock"></i>
+                            <i class="bi bi-speedometer2"></i>
                         </div>
                         <div class="glass-chip-text">
-                            <h6>Role Permissions</h6>
-                            <p>Secure collector & citizen accounts audit</p>
+                            <h6>Fill Level Alerts</h6>
+                            <p>Targeting bins above 50% and 92%</p>
                         </div>
                     </div>
 
                     <div class="glass-chip">
                         <div class="glass-chip-icon">
-                            <i class="bi bi-graph-up-arrow"></i>
+                            <i class="bi bi-check2-circle"></i>
                         </div>
                         <div class="glass-chip-text">
-                            <h6>City Sustainability</h6>
-                            <p>Real-time CO₂ and diversion analytics</p>
+                            <h6>Shift Audit</h6>
+                            <p>Real-time completion verification</p>
                         </div>
                     </div>
                 </div>
@@ -473,18 +463,18 @@
             <!-- Bottom Live Telemetry Bar -->
             <div class="hero-telemetry-strip">
                 <div class="telemetry-item">
-                    <span class="telemetry-val">3 Hubs</span>
-                    <span class="telemetry-lbl">Recovery Centers</span>
+                    <span class="telemetry-val">14 Bins</span>
+                    <span class="telemetry-lbl">Scheduled Today</span>
                 </div>
                 <div class="telemetry-divider"></div>
                 <div class="telemetry-item">
-                    <span class="telemetry-val">100%</span>
-                    <span class="telemetry-lbl">Sensor Health</span>
+                    <span class="telemetry-val">2.8t</span>
+                    <span class="telemetry-lbl">Truck Capacity</span>
                 </div>
                 <div class="telemetry-divider"></div>
                 <div class="telemetry-item">
-                    <span class="telemetry-val">99.9%</span>
-                    <span class="telemetry-lbl">Grid Uptime</span>
+                    <span class="telemetry-val">98.6%</span>
+                    <span class="telemetry-lbl">On-Time Rate</span>
                 </div>
             </div>
         </div>
@@ -495,7 +485,7 @@
         <div class="form-panel-inner">
             <!-- Back Navigation -->
             <div class="mb-4">
-                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 text-decoration-none d-inline-flex align-items-center text-light">
+                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 text-decoration-none d-inline-flex align-items-center">
                     <i class="bi bi-arrow-left me-2"></i>Back to Portal Selection
                 </a>
             </div>
@@ -503,23 +493,23 @@
             <div class="card">
                 <div class="card-header">
                     <div class="logo-icon">
-                        <i class="bi bi-shield-check"></i>
+                        <i class="bi bi-truck"></i>
                     </div>
                     <div class="logo-text">
-                        <h3>Administrator Command</h3>
-                        <p>Municipal Security & Infrastructure Access</p>
+                        <h3>Driver & Collector</h3>
+                        <p>Fleet Terminal & Daily Shift Dispatch</p>
                     </div>
                 </div>
                 <div class="card-body">
                     <div id="alertBox" class="alert alert-danger d-none" role="alert"></div>
 
-                    <form id="adminLoginForm">
+                    <form id="collectorLoginForm">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Administrator Email</label>
-                            <input type="email" class="form-control" id="email" required placeholder="admin@smartwaste.local">
+                            <label for="email" class="form-label">Driver / Operator Email</label>
+                            <input type="email" class="form-control" id="email" required placeholder="e.g. collins.collector@smartwaste.local">
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Security Keyphrase / Password</label>
+                            <label for="password" class="form-label">Terminal Password</label>
                             <div class="password-input-group">
                                 <input type="password" class="form-control" id="password" required placeholder="••••••••">
                                 <button type="button" class="password-toggle" id="passwordToggle">
@@ -530,17 +520,17 @@
 
                         <div class="mb-3 form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="rememberMe" checked>
-                            <label class="form-check-label text-muted small" for="rememberMe">Remember administrator session</label>
+                            <label class="form-check-label" for="rememberMe">Remember my unit on this terminal</label>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 py-2 mb-3" id="signInBtn">
                             <span class="spinner-border spinner-border-sm me-2 d-none" id="btnSpinner"></span>
-                            <span id="btnText"><i class="bi bi-shield-lock-fill me-2"></i>Authenticate to Command Center</span>
+                            <span id="btnText"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In to Fleet Terminal</span>
                         </button>
                     </form>
 
                     <div class="text-center mt-3">
-                        <small class="text-muted">Strictly restricted to authorized municipal supervisors.</small>
+                        <small class="text-muted">Assigned driver accounts are configured by municipal operations.</small>
                     </div>
                 </div>
             </div>
@@ -548,7 +538,6 @@
     </div>
 </div>
 
-<script src="/js/api-service.js"></script>
 <script>
     // Cursor spotlight effect
     const heroPanel = document.getElementById('heroPanel');
@@ -574,8 +563,8 @@
         });
     }
 
-    // Admin Login Handler
-    const form = document.getElementById('adminLoginForm');
+    // Collector Login Handler
+    const form = document.getElementById('collectorLoginForm');
     const alertBox = document.getElementById('alertBox');
     const signInBtn = document.getElementById('signInBtn');
     const btnSpinner = document.getElementById('btnSpinner');
@@ -595,10 +584,10 @@
         signInBtn.disabled = isLoading;
         if (isLoading) {
             btnSpinner.classList.remove('d-none');
-            btnText.textContent = 'Authenticating Command Privileges...';
+            btnText.textContent = 'Authenticating Fleet Operator...';
         } else {
             btnSpinner.classList.add('d-none');
-            btnText.innerHTML = '<i class="bi bi-shield-lock-fill me-2"></i>Authenticate to Command Center';
+            btnText.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Sign In to Fleet Terminal';
         }
     }
 
@@ -616,22 +605,30 @@
         setLoading(true);
 
         try {
-            const res = await window.apiService.adminLogin({ email, password });
-            const token = (res && res.data && res.data.token) || res.token;
-            if (!token) throw new Error('No admin token received');
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.toLowerCase(), password })
+            });
 
-            const role = (res && res.data && res.data.role) || (res && res.role);
-            if (role !== 'admin') {
-                window.apiService.clearAdminSession(false);
-                throw new Error('Administrator privilege required for this portal');
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                const token = data.data && data.data.token;
+                if (!token) throw new Error('No authentication token received');
+
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('user', JSON.stringify(data.data));
+
+                showAlert('✅ Operator authenticated. Connecting to fleet dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard-collector.html';
+                }, 1000);
+            } else {
+                throw new Error(data.message || 'Authentication failed');
             }
-
-            showAlert('✅ Command clearance verified. Redirecting to Command Dashboard...', 'success');
-            setTimeout(() => {
-                window.location.href = '/dashboard-admin.html';
-            }, 1000);
         } catch (err) {
-            showAlert(err.message || 'Invalid administrator credentials');
+            showAlert(err.message || 'Connection error. Please try again.');
         } finally {
             setLoading(false);
         }

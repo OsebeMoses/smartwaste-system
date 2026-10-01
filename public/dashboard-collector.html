@@ -689,17 +689,48 @@
                 <div class="col-lg-9 col-md-8">
                     <!-- Dashboard Section -->
                     <div id="dashboard-section" class="dashboard-section">
-                        <!-- Welcome Banner -->
-                        <div class="card welcome-banner border-0 mb-4" style="background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);">
-                            <div class="card-body">
+                        
+                        <!-- Active Vehicle & Robotic Crane Telemetry Banner -->
+                        <div class="card mb-4 border-0 overflow-hidden" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid rgba(59, 130, 246, 0.3) !important;">
+                            <div class="card-body p-4">
                                 <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <h4 class="text-white mb-2">Welcome back, <span id="welcomeName">Collector</span>! 🚚</h4>
-                                        <p class="mb-0 text-white-75">Ready to serve your community? Check pending pickups or view your schedule.</p>
+                                    <div class="col-md-4 col-12 mb-3 mb-md-0">
+                                        <div class="position-relative rounded-3 overflow-hidden shadow" style="border: 2px solid rgba(59, 130, 246, 0.4);">
+                                            <img src="images/collector-truck-crane.jpg" alt="Active Crane Lift Truck" class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
+                                            <span class="badge bg-primary position-absolute top-0 start-0 m-2"><i class="bi bi-gear-fill me-1"></i>TRUCK #08 • CRANE LIFT</span>
+                                            <span class="badge bg-success position-absolute bottom-0 end-0 m-2"><i class="bi bi-circle-fill me-1" style="font-size: 0.55rem;"></i>ACTIVE GPS</span>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4 text-end">
-                                        <button class="btn btn-light rounded-pill px-4 fw-semibold" onclick="showSection('pickups')">
+                                    <div class="col-md-5 col-12 mb-3 mb-md-0">
+                                        <h4 class="text-white fw-bold mb-1">Welcome back, <span id="welcomeName">Collector</span>! 🚚</h4>
+                                        <p class="text-muted small mb-3">Nairobi Central Sector • Robotic Arm Crane Collection Unit</p>
+                                        <div class="row g-2">
+                                            <div class="col-4">
+                                                <div class="p-2 rounded bg-dark border border-secondary border-opacity-50 text-center">
+                                                    <small class="text-muted d-block" style="font-size: 0.72rem;">Payload</small>
+                                                    <strong class="text-info" style="font-size: 0.95rem;">68% (1.9t)</strong>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="p-2 rounded bg-dark border border-secondary border-opacity-50 text-center">
+                                                    <small class="text-muted d-block" style="font-size: 0.72rem;">Crane Arm</small>
+                                                    <strong class="text-success" style="font-size: 0.95rem;">Optimal</strong>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="p-2 rounded bg-dark border border-secondary border-opacity-50 text-center">
+                                                    <small class="text-muted d-block" style="font-size: 0.72rem;">Next Depot</small>
+                                                    <strong class="text-warning" style="font-size: 0.95rem;">Hub #2</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-12 text-md-end text-center">
+                                        <button class="btn btn-primary rounded-pill px-4 py-2 fw-semibold w-100 mb-2" onclick="showSection('pickups')">
                                             <i class="bi bi-truck me-2"></i>View Requests
+                                        </button>
+                                        <button class="btn btn-outline-info rounded-pill px-3 py-1 fw-semibold w-100 btn-sm" onclick="showSection('map')">
+                                            <i class="bi bi-map me-1"></i>Optimized Route
                                         </button>
                                     </div>
                                 </div>

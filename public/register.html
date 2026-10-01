@@ -4,80 +4,303 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartWaste - Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
+        <style>
         :root {
             --light-green: #e8f5e9;
-            --medium-green: #4caf50;
-            --dark-green: #2e7d32;
-            --accent-green: #81c784;
+            --medium-green: #2e7d32;
+            --dark-green: #1b5e20;
+            --accent-green: #00e676;
+            --accent-light: #4ade80;
             --white: #ffffff;
-            --black: #1b1b1b;
-            --light-gray: #f5f5f5;
-            --text-dark: #333333;
+            --text-dark: #1e293b;
         }
-        
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, var(--light-green) 0%, var(--accent-green) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-dark);
-        }
-        
-        .container {
-            max-width: 1200px;
-        }
-        
-        .hero-section {
-            padding: 2rem;
-        }
-        
-        .hero-title {
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: var(--dark-green);
-            margin-bottom: 1rem;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-dark);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        
-        .features-list {
-            list-style: none;
+            margin: 0;
             padding: 0;
+            min-height: 100vh;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            overflow-x: hidden;
         }
-        
-        .features-list li {
-            margin-bottom: 1rem;
+
+        /* Split-screen wrapper */
+        .split-auth-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT HERO PANEL (Full-bleed photo background + sleek overlaid glass content) */
+        .hero-split-panel {
+            flex: 1 1 52%;
+            position: relative;
+            background-image: url('images/resident-biometric-bin.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-gradient-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, 
+                rgba(5, 18, 10, 0.78) 0%, 
+                rgba(9, 28, 16, 0.62) 42%, 
+                rgba(4, 14, 8, 0.90) 100%
+            );
+            z-index: 1;
+            backdrop-filter: saturate(115%);
+        }
+
+        .hero-content-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 3.5rem 3.5rem;
+            color: #ffffff;
+        }
+
+        /* Top Bar Badge */
+        .hero-top-badge {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
         }
-        
-        .features-list i {
-            color: var(--medium-green);
-            margin-right: 0.75rem;
-            font-size: 1.2rem;
+
+        .iot-beacon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #dcfce7;
         }
-        
+
+        .pulse-beacon {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+            display: inline-block;
+            animation: pulseBeacon 2s infinite;
+        }
+
+        @keyframes pulseBeacon {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(0, 230, 118, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+        }
+
+        .network-badge {
+            padding: 5px 12px;
+            background: rgba(46, 125, 50, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(129, 199, 132, 0.35);
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #e8f5e9;
+        }
+
+        /* Main Typography Over Photo */
+        .hero-center-content {
+            margin: auto 0;
+            padding: 1.5rem 0;
+        }
+
+        .hero-glamour-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: 0.75rem;
+            text-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
+        }
+
+        .hero-headline {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1.18;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-headline span {
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: 1.08rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.88);
+            max-width: 520px;
+            margin-bottom: 2.2rem;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sleek Frosted Glass Feature Cards Grid */
+        .glass-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+            max-width: 540px;
+        }
+
+        .glass-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .glass-chip:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(74, 222, 128, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.2);
+        }
+
+        .glass-chip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(0, 230, 118, 0.15);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-light);
+            font-size: 1.15rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(0, 230, 118, 0.2);
+        }
+
+        .glass-chip-text h6 {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .glass-chip-text p {
+            margin: 0;
+            font-size: 0.76rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        /* Bottom Sleek Metric Telemetry Bar */
+        .hero-telemetry-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 1rem 1.5rem;
+            background: rgba(10, 25, 15, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            max-width: 540px;
+        }
+
+        .telemetry-item {
+            text-align: center;
+        }
+
+        .telemetry-val {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--accent-light);
+            display: block;
+            line-height: 1.2;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+        }
+
+        .telemetry-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.72);
+            font-weight: 500;
+        }
+
+        .telemetry-divider {
+            width: 1px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* RIGHT AUTH FORM PANEL */
+        .form-split-panel {
+            flex: 1 1 48%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #edf7ee 100%);
+            min-height: 100vh;
+        }
+
+        .form-panel-inner {
+            width: 100%;
+            max-width: 480px;
+        }
+
         .card {
             border: none;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.07);
             overflow: hidden;
             background: var(--white);
+            border: 1px solid rgba(76, 175, 80, 0.15);
         }
         
         .card-header {
-            background: linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
             border: none;
-            padding: 2rem 1.5rem;
+            padding: 1.75rem 1.5rem;
             text-align: center;
         }
         
@@ -85,68 +308,72 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
         
         .logo-icon {
             background: var(--white);
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-right: 0.85rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
         }
         
         .logo-icon i {
-            font-size: 1.8rem;
-            color: var(--dark-green);
+            font-size: 1.5rem;
+            color: #1b5e20;
         }
         
         .logo-text {
             color: var(--white);
+            text-align: left;
         }
         
         .logo-text h3 {
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            font-size: 1.4rem;
+            margin-bottom: 0.1rem;
         }
         
         .logo-text p {
             margin-bottom: 0;
+            font-size: 0.85rem;
             opacity: 0.9;
         }
         
         .card-body {
-            padding: 2rem 1.5rem;
+            padding: 1.75rem;
         }
         
         .form-label {
             font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
+            color: #334155;
+            font-size: 0.88rem;
+            margin-bottom: 0.35rem;
         }
         
         .form-control, .form-select {
             border-radius: 10px;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e0e0e0;
+            padding: 0.7rem 0.95rem;
+            border: 2px solid #e2e8f0;
             transition: all 0.3s;
-            background: var(--white);
+            background: #ffffff;
         }
         
         .form-control:focus, .form-select:focus {
-            border-color: var(--medium-green);
-            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.2);
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.2);
         }
         
         .btn-success {
-            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
             border: none;
             border-radius: 10px;
-            padding: 0.85rem;
+            padding: 0.8rem;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s;
@@ -154,40 +381,41 @@
         
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 5px 15px rgba(27, 94, 32, 0.35);
         }
         
         .alert {
             border-radius: 10px;
             border: none;
-            padding: 1rem 1.25rem;
+            padding: 0.85rem 1.15rem;
+            font-size: 0.9rem;
         }
         
         .form-text {
-            color: #757575;
-            font-size: 0.875rem;
+            color: #64748b;
+            font-size: 0.8rem;
         }
-        
+
         .divider {
             display: flex;
             align-items: center;
             text-align: center;
-            margin: 1.5rem 0;
-            color: #9e9e9e;
+            margin: 1.25rem 0;
+            color: #94a3b8;
         }
         
         .divider::before,
         .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e2e8f0;
         }
         
         .divider span {
             padding: 0 1rem;
+            font-size: 0.85rem;
         }
 
-        /* Password input group */
         .password-input-group {
             position: relative;
         }
@@ -199,7 +427,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #6c757d;
+            color: #64748b;
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
@@ -207,57 +435,142 @@
         }
 
         .password-toggle:hover {
-            color: var(--dark-green);
+            color: #1b5e20;
             background-color: rgba(0, 0, 0, 0.05);
         }
         
-        @media (max-width: 768px) {
-            .hero-section {
-                text-align: center;
-                padding: 1rem;
+        @media (max-width: 991.98px) {
+            .split-auth-container {
+                flex-direction: column;
             }
-            
-            .hero-title {
-                font-size: 2.2rem;
+
+            .hero-split-panel {
+                flex: none;
+                min-height: 520px;
             }
-            
-            .features-list {
-                text-align: left;
-                display: inline-block;
+
+            .hero-content-wrapper {
+                padding: 2.5rem 1.75rem;
+            }
+
+            .hero-headline {
+                font-size: 2.15rem;
+            }
+
+            .glass-chips-grid {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+
+            .form-split-panel {
+                flex: none;
+                min-height: auto;
+                padding: 2rem 1.25rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- Hero Section -->
-            <div class="col-lg-6">
-                <div class="hero-section">
-                    <h1 class="hero-title">Join SmartWaste Today</h1>
-                    <p class="hero-subtitle">Create your account and start making a difference in your community's waste management.</p>
-                    
-                    <ul class="features-list">
-                        <li><i class="bi bi-check-circle-fill"></i><span>Easy waste pickup scheduling</span></li>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Track your environmental impact</span></li>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Earn rewards for recycling</span></li>
-                        <li><i class="bi bi-check-circle-fill"></i><span>Connect with local collectors</span></li>
-                    </ul>
-                    
-                    <div class="mt-4">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-shield-check me-2" style="color: var(--dark-green); font-size: 1.5rem;"></i>
-                            <div>
-                                <h5 class="mb-0">Secure & Reliable</h5>
-                                <small class="text-muted">Your data is protected with enterprise-grade security</small>
+    <div class="split-auth-container">
+        <!-- LEFT HERO PANEL (Full-bleed photo background + sleek overlaid glass content) -->
+        <div class="hero-split-panel" id="heroPanel">
+            <div class="hero-spotlight" id="heroSpotlight"></div>
+            <div class="hero-gradient-overlay"></div>
+            
+            <div class="hero-content-wrapper">
+                <!-- Top Status Badge -->
+                <div class="hero-top-badge">
+                    <div class="iot-beacon">
+                        <span class="pulse-beacon"></span>
+                        <span>IoT Sensor Grid Active</span>
+                    </div>
+                    <div class="network-badge">
+                        <i class="bi bi-broadcast me-1"></i>5G / LoRaWAN
+                    </div>
+                </div>
+
+                <!-- Center Content Over Photo -->
+                <div class="hero-center-content">
+                    <span class="hero-glamour-tag">AI-POWERED ECO-INTELLIGENCE</span>
+                    <h1 class="hero-headline">Join SmartWaste <span>Today</span></h1>
+                    <p class="hero-description">Create your account and become part of a cleaner, smarter community powered by real-time waste intelligence.</p>
+
+                    <!-- Sleek Glassmorphic Feature Cards -->
+                    <div class="glass-chips-grid">
+                        <div class="glass-chip">
+                            <div class="glass-chip-icon">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div class="glass-chip-text">
+                                <h6>Easy Scheduling</h6>
+                                <p>On-demand household pickups</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-chip">
+                            <div class="glass-chip-icon">
+                                <i class="bi bi-cpu-fill"></i>
+                            </div>
+                            <div class="glass-chip-text">
+                                <h6>Impact Metrics</h6>
+                                <p>Track total waste recycled</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-chip">
+                            <div class="glass-chip-icon">
+                                <i class="bi bi-award-fill"></i>
+                            </div>
+                            <div class="glass-chip-text">
+                                <h6>Earn Rewards</h6>
+                                <p>Redeem points for eco-discounts</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-chip">
+                            <div class="glass-chip-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="glass-chip-text">
+                                <h6>Verified Collectors</h6>
+                                <p>Licensed and GPS-tracked routes</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Bottom Live Telemetry Bar -->
+                <div class="hero-telemetry-strip">
+                    <div class="telemetry-item">
+                        <span class="telemetry-val">1,200+</span>
+                        <span class="telemetry-lbl">Tons Recycled</span>
+                    </div>
+                    <div class="telemetry-divider"></div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-val">99.8%</span>
+                        <span class="telemetry-lbl">System Uptime</span>
+                    </div>
+                    <div class="telemetry-divider"></div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-val">32%</span>
+                        <span class="telemetry-lbl">Avg. Fill Level</span>
+                    </div>
+                </div>
             </div>
-            
-            <!-- Register Card -->
-            <div class="col-lg-6">
+        </div>
+
+        <!-- RIGHT AUTH FORM PANEL -->
+        <div class="form-split-panel">
+            <div class="form-panel-inner">
+                
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 text-decoration-none d-inline-flex align-items-center">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Portal Selection
+                    </a>
+                    <a href="/login.html" class="small text-muted text-decoration-none">
+                        Existing Resident? <strong>Login</strong>
+                    </a>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <div class="logo-container">
@@ -323,7 +636,6 @@
                         <!-- Alert Messages -->
                         <div id="alertBox" class="alert mt-3" style="display: none;"></div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
